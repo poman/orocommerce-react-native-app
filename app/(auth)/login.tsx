@@ -31,7 +31,6 @@ export default function LoginScreen() {
   const [passwordError, setPasswordError] = useState('');
 
   const handleBack = () => {
-
     if (redirect === 'profile') {
       router.replace('/(tabs)/profile');
     } else if (redirect === 'orders') {
@@ -92,16 +91,10 @@ export default function LoginScreen() {
           router.replace('/(tabs)/profile');
         }, 500);
       } else {
-        showToast(
-          result.error || 'Please check your credentials and try again.',
-          'error'
-        );
+        showToast(result.error || 'Please check your credentials and try again.', 'error');
       }
     } catch (error: any) {
-      showToast(
-        error.message || 'An unexpected error occurred. Please try again.',
-        'error'
-      );
+      showToast(error.message || 'An unexpected error occurred. Please try again.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -113,11 +106,7 @@ export default function LoginScreen() {
         {/* Sticky Header */}
         <View style={styles.stickyHeaderWrapper}>
           <View style={styles.stickyHeader}>
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={handleBack}
-              disabled={isLoading}
-            >
+            <TouchableOpacity style={styles.headerButton} onPress={handleBack} disabled={isLoading}>
               <ArrowLeft size={24} color={ShopColors.text} />
             </TouchableOpacity>
 
@@ -167,7 +156,7 @@ export default function LoginScreen() {
                       autoCorrect={false}
                       keyboardType="email-address"
                       value={email}
-                      onChangeText={(text) => {
+                      onChangeText={text => {
                         setEmail(text);
                         if (emailError) setEmailError('');
                       }}
@@ -177,9 +166,7 @@ export default function LoginScreen() {
                       editable={!isLoading}
                       returnKeyType="next"
                     />
-                    {emailError ? (
-                      <Text style={styles.errorText}>{emailError}</Text>
-                    ) : null}
+                    {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
                   </View>
 
                   <View style={styles.inputGroup}>
@@ -193,7 +180,7 @@ export default function LoginScreen() {
                       autoCapitalize="none"
                       autoCorrect={false}
                       value={password}
-                      onChangeText={(text) => {
+                      onChangeText={text => {
                         setPassword(text);
                         if (passwordError) setPasswordError('');
                       }}
@@ -204,9 +191,7 @@ export default function LoginScreen() {
                       returnKeyType="done"
                       onSubmitEditing={handleLogin}
                     />
-                    {passwordError ? (
-                      <Text style={styles.errorText}>{passwordError}</Text>
-                    ) : null}
+                    {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
                   </View>
 
                   <TouchableOpacity
@@ -251,9 +236,7 @@ export default function LoginScreen() {
                       }}
                       activeOpacity={0.7}
                     >
-                      <Text style={styles.demoLoginBadgeText}>
-                        Try demo account →
-                      </Text>
+                      <Text style={styles.demoLoginBadgeText}>Try demo account →</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -326,7 +309,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingBottom: 24,
   },
   formContainer: {

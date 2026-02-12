@@ -53,7 +53,8 @@ export default function TabLayout() {
             maxWidth: 'none',
           } as any,
         }),
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

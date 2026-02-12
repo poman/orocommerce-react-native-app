@@ -24,7 +24,6 @@ export default function ForgotPasswordScreen() {
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-
   const validateEmail = (email: string): boolean => {
     if (!email.trim()) {
       setEmailError('Email is required');
@@ -131,7 +130,7 @@ export default function ForgotPasswordScreen() {
                       autoCorrect={false}
                       keyboardType="email-address"
                       value={email}
-                      onChangeText={(text) => {
+                      onChangeText={text => {
                         setEmail(text);
                         if (emailError) setEmailError('');
                       }}
@@ -142,9 +141,7 @@ export default function ForgotPasswordScreen() {
                       returnKeyType="send"
                       onSubmitEditing={handleResetPassword}
                     />
-                    {emailError ? (
-                      <Text style={styles.errorText}>{emailError}</Text>
-                    ) : null}
+                    {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
                   </View>
 
                   <TouchableOpacity
@@ -171,10 +168,7 @@ export default function ForgotPasswordScreen() {
                 <View style={styles.footer}>
                   <Text style={styles.footerText}>
                     Remember your password?{' '}
-                    <Text
-                      style={styles.footerLink}
-                      onPress={() => router.back()}
-                    >
+                    <Text style={styles.footerLink} onPress={() => router.back()}>
                       Sign In
                     </Text>
                   </Text>
@@ -247,7 +241,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingBottom: 24,
   },
   formContainer: {

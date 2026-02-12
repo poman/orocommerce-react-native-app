@@ -17,7 +17,7 @@ import { RefreshCw, Package } from '@/src/libs/Icon';
 import { HtmlRenderer } from '@/src/components/HtmlRenderer';
 import { useShop } from '@/src/context/ShopContext';
 import { useConfig } from '@/src/context/ConfigContext';
-import { ShopColors, HomepageBanners , HomepageSectionBanners } from '@/src/constants/theme';
+import { ShopColors, HomepageBanners, HomepageSectionBanners } from '@/src/constants/theme';
 import { useProducts } from '@/src/api/hooks/useProducts';
 import { useCategories } from '@/src/api/hooks/useCategories';
 import { ProductCardSkeleton } from '@/src/components/ProductCardSkeleton';
@@ -30,7 +30,7 @@ import { RecentlyViewedSection } from '@/src/components/RecentlyViewedSection';
 import { FeaturedProductsSection } from '@/src/components/FeaturedProductsSection';
 import { NewArrivalSection } from '@/src/components/NewArrivalSection';
 import { SectionBanner } from '@/src/components/SectionBanner';
-import { getProductsByIds , IProduct } from '@/src/api/helpers/products';
+import { getProductsByIds, IProduct } from '@/src/api/helpers/products';
 import { AppConfig } from '@/src/constants/config';
 import { ConfigWizard } from '@/src/components/ConfigWizard';
 import { useApiErrorHandler } from '@/src/api/hooks/useApiErrorHandler';
@@ -40,8 +40,8 @@ export default function HomeScreen() {
   const { toggleWishlist, isInWishlist } = useShop();
   const { baseUrl } = useConfig();
   const { isAuthenticated, getValidAccessToken, refreshAccessToken } = useAuth();
-  const { recentlyViewedIds, isLoading: _loadingRecentlyViewedIds } = useRecentlyViewed();
-  const { errorState, handleApiError, closeWizard, resetError: _resetError, showSignIn, dismissSignIn: _dismissSignIn } = useApiErrorHandler();
+  const { recentlyViewedIds } = useRecentlyViewed();
+  const { errorState, handleApiError, closeWizard, showSignIn } = useApiErrorHandler();
 
   const [activeBanner, setActiveBanner] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -52,7 +52,7 @@ export default function HomeScreen() {
   const [loadingRecentlyViewed, setLoadingRecentlyViewed] = useState(false);
   const [wizardJustCompleted, setWizardJustCompleted] = useState(false);
 
-  const { loading: _loading, error, products: _apiProducts, refetch } = useProducts(
+  const { error, refetch } = useProducts(
     {
       page: { number: 1, size: 10 },
       sort: '-id',
@@ -97,10 +97,7 @@ export default function HomeScreen() {
     refreshAccessToken
   );
 
-  const {
-    categories,
-    refetch: refetchCategories,
-  } = useCategories(
+  const { categories, refetch: refetchCategories } = useCategories(
     {
       page: { number: 1, size: 100 },
     },
@@ -130,12 +127,7 @@ export default function HomeScreen() {
     error: catalogProductsError,
     products: catalogProducts,
     refetch: refetchCatalogProducts,
-  } = useProducts(
-    catalogProductsParams,
-    baseUrl,
-    getValidAccessToken,
-    refreshAccessToken
-  );
+  } = useProducts(catalogProductsParams, baseUrl, getValidAccessToken, refreshAccessToken);
 
   React.useEffect(() => {
     if (activeTab === 'catalog' && categories.length > 0 && !selectedCategory) {
@@ -164,6 +156,7 @@ export default function HomeScreen() {
         handleApiError(anyError);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, errorFeaturedProducts, errorNewArrivalProducts, isAuthenticated, baseUrl]);
 
   React.useEffect(() => {
@@ -176,6 +169,7 @@ export default function HomeScreen() {
         showSignIn();
       }, 300);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wizardJustCompleted, error, errorFeaturedProducts, errorNewArrivalProducts, isAuthenticated]);
 
   const handleRefresh = async () => {
@@ -202,8 +196,7 @@ export default function HomeScreen() {
     setSelectedCategory(categoryId);
   };
 
-
-  const handleBannerPress = (banner: typeof HomepageBanners[0]) => {
+  const handleBannerPress = (banner: (typeof HomepageBanners)[0]) => {
     if (banner.link) {
       if (banner.link.startsWith('/')) {
         router.push(banner.link as any);
@@ -225,10 +218,7 @@ export default function HomeScreen() {
         {HomepageBanners.map((_, index) => (
           <View
             key={index}
-            style={[
-              styles.dot,
-              index === activeBanner ? styles.activeDot : styles.inactiveDot,
-            ]}
+            style={[styles.dot, index === activeBanner ? styles.activeDot : styles.inactiveDot]}
           />
         ))}
       </View>
@@ -266,6 +256,7 @@ export default function HomeScreen() {
     } else {
       setRecentlyViewedProducts([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recentlyViewedIds, baseUrl, getValidAccessToken, isAuthenticated]);
 
   return (
@@ -277,30 +268,27 @@ export default function HomeScreen() {
           }}
         />
 
-        <ShopHeader
-          showTabs={true}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
+        <ShopHeader showTabs={true} activeTab={activeTab} onTabChange={handleTabChange} />
+
+        <ConfigWizard
+          visible={errorState.showWizard && !errorState.showSignInPrompt}
+          onComplete={async () => {
+            closeWizard();
+            setWizardJustCompleted(true);
+            await handleRefresh();
+          }}
+          canDismiss={!errorState.isUnauthorized}
+          reason={errorState.wizardReason || 'missing_config'}
         />
 
-      <ConfigWizard
-        visible={errorState.showWizard && !errorState.showSignInPrompt}
-        onComplete={async () => {
-          closeWizard();
-          setWizardJustCompleted(true);
-          await handleRefresh();
-        }}
-        canDismiss={!errorState.isUnauthorized}
-        reason={errorState.wizardReason || 'missing_config'}
-      />
-
-      {errorState.showSignInPrompt && !isAuthenticated ? (
+        {errorState.showSignInPrompt && !isAuthenticated ? (
           <View style={styles.guestContainerWrapper}>
             <View style={styles.guestContainer}>
               <Package size={80} color={ShopColors.textSecondary} />
               <Text style={styles.guestTitle}>Sign in to browse products</Text>
               <Text style={styles.guestText}>
-                Guest Storefront API is disabled. Please sign in to access the catalog and browse products.
+                Guest Storefront API is disabled. Please sign in to access the catalog and browse
+                products.
               </Text>
               <TouchableOpacity
                 style={styles.loginButton}
@@ -313,259 +301,265 @@ export default function HomeScreen() {
           </View>
         ) : (
           <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ alignItems: 'center' }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={ShopColors.primary}
-            colors={[ShopColors.primary]}
-          />
-        }
-      >
-        <View style={[styles.contentWrapper, { maxWidth: layout.constrainedWidth }]}>
-
-        {/* HOME Tab Content */}
-        {activeTab === 'home' && (
-          <>
-        <View style={styles.bannerSection}>
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            decelerationRate="fast"
-            snapToInterval={layout.bannerWidth + 32}
-            contentContainerStyle={styles.bannerScrollContent}
+            style={styles.scrollView}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ alignItems: 'center' }}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={ShopColors.primary}
+                colors={[ShopColors.primary]}
+              />
+            }
           >
-            {HomepageBanners.map((banner, index) => (
-              <TouchableOpacity
-                key={banner.id}
-                style={[
-                  styles.bannerCard,
-                  {
-                    width: layout.bannerWidth,
-                    marginLeft: index === 0 ? 16 : 0,
-                    marginRight: 16,
-                  }
-                ]}
-                onPress={() => handleBannerPress(banner)}
-                activeOpacity={banner.link ? 0.9 : 1}
-                disabled={!banner.link}
-              >
-                <Image
-                  source={{ uri: banner.image }}
-                  style={styles.bannerImage}
-                />
-                <View style={styles.bannerOverlay}>
-                  {banner.badge && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>{banner.badge}</Text>
-                    </View>
-                  )}
-                  <Text style={styles.bannerTitle}>{banner.title}</Text>
-                  <Text style={styles.bannerSubtitle}>{banner.subtitle}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-          {renderBannerDots()}
-        </View>
-
-        {/* Section Banner before Recently Viewed */}
-        {HomepageSectionBanners.filter(b => b.position === 'before-recently-viewed').map(({ banner }) => (
-          <SectionBanner
-            key={banner.id}
-            banner={banner}
-            width={layout.constrainedWidth}
-          />
-        ))}
-
-        {/* Recently Viewed Section */}
-        <RecentlyViewedSection
-          products={recentlyViewedProducts}
-          baseUrl={baseUrl}
-          isInWishlist={isInWishlist}
-          onToggleWishlist={toggleWishlist}
-          cardWidth={layout.cardWidth}
-          isLoading={loadingRecentlyViewed}
-        />
-
-        {/* Section Banner after Recently Viewed */}
-        {HomepageSectionBanners.filter(b => b.position === 'after-recently-viewed').map(({ banner }) => (
-          <SectionBanner
-            key={banner.id}
-            banner={banner}
-            width={layout.constrainedWidth}
-          />
-        ))}
-
-        {/* Featured Products Section */}
-        <FeaturedProductsSection
-          products={featuredProductsData}
-          baseUrl={baseUrl}
-          isInWishlist={isInWishlist}
-          onToggleWishlist={toggleWishlist}
-          cardWidth={layout.cardWidth}
-          isLoading={loadingFeaturedProducts}
-        />
-
-        {/* Section Banner after Featured Products */}
-        {HomepageSectionBanners.filter(b => b.position === 'after-featured').map(({ banner }) => (
-          <SectionBanner
-            key={banner.id}
-            banner={banner}
-            width={layout.constrainedWidth}
-          />
-        ))}
-
-        {/* New Arrival Section */}
-        <NewArrivalSection
-          products={newArrivalProductsData}
-          baseUrl={baseUrl}
-          isInWishlist={isInWishlist}
-          onToggleWishlist={toggleWishlist}
-          cardWidth={layout.cardWidth}
-          isLoading={loadingNewArrivalProducts}
-        />
-
-        {/* Section Banner after New Arrival */}
-        {HomepageSectionBanners.filter(b => b.position === 'after-new-arrival').map(({ banner }) => (
-          <SectionBanner
-            key={banner.id}
-            banner={banner}
-            width={layout.constrainedWidth}
-          />
-        ))}
-
-        {/* Section Banner after Trending */}
-        {HomepageSectionBanners.filter(b => b.position === 'after-all').map(({ banner }) => (
-          <SectionBanner
-            key={banner.id}
-            banner={banner}
-            width={layout.constrainedWidth}
-          />
-        ))}
-        </>
-        )}
-
-        {/* CATALOG Tab Content */}
-        {activeTab === 'catalog' && (
-          <>
-            {/* Categories */}
-            <View style={styles.categoriesSection}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.categoriesScroll}
-              >
-                {categories.map((category) => (
-                  <TouchableOpacity
-                    key={category.id}
-                    style={[
-                      styles.categoryChip,
-                      selectedCategory === category.id && styles.categoryChipActive,
-                    ]}
-                    onPress={() => handleCategorySelect(category.id)}
-                  >
-                    <Text
-                      style={[
-                        styles.categoryChipText,
-                        selectedCategory === category.id &&
-                        styles.categoryChipTextActive,
-                      ]}
+            <View style={[styles.contentWrapper, { maxWidth: layout.constrainedWidth }]}>
+              {/* HOME Tab Content */}
+              {activeTab === 'home' && (
+                <>
+                  <View style={styles.bannerSection}>
+                    <ScrollView
+                      horizontal
+                      pagingEnabled
+                      showsHorizontalScrollIndicator={false}
+                      onScroll={handleScroll}
+                      scrollEventThrottle={16}
+                      decelerationRate="fast"
+                      snapToInterval={layout.bannerWidth + 32}
+                      contentContainerStyle={styles.bannerScrollContent}
                     >
-                      {category.attributes.title}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-
-            {/* Catalog Products Section */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>
-                {selectedCategory
-                  ? categories.find(c => c.id === selectedCategory)?.attributes.title || 'Products'
-                  : 'All Products'
-                }
-              </Text>
-
-              {/* Category Description - Between title and products */}
-              {selectedCategory && (
-                (() => {
-                  const currentCategory = categories.find(c => c.id === selectedCategory);
-                  const description = currentCategory?.attributes?.shortDescription ||
-                                    currentCategory?.attributes?.description;
-
-                  if (description) {
-                    return (
-                      <View style={styles.categoryDescriptionSection}>
-                        <HtmlRenderer html={description} />
-                      </View>
-                    );
-                  }
-                  return null;
-                })()
-              )}
-
-
-              {loadingCatalogProducts && (
-                <View style={styles.productsGrid}>
-                  {Array.from({ length: 10 }).map((_, index) => (
-                    <ProductCardSkeleton key={`skeleton-${index}`} width={layout.cardWidth} />
-                  ))}
-                </View>
-              )}
-
-              {catalogProductsError && (
-                <View style={styles.errorContainer}>
-                  <View style={styles.errorContent}>
-                    <View style={styles.errorTextContainer}>
-                      <Text style={styles.errorText}>Error loading products</Text>
-                      <Text style={styles.errorDetail}>{catalogProductsError}</Text>
-                    </View>
-                    <TouchableOpacity
-                      style={styles.reloadIconButton}
-                      onPress={refetchCatalogProducts}
-                    >
-                      <RefreshCw size={24} color={ShopColors.primary} />
-                    </TouchableOpacity>
+                      {HomepageBanners.map((banner, index) => (
+                        <TouchableOpacity
+                          key={banner.id}
+                          style={[
+                            styles.bannerCard,
+                            {
+                              width: layout.bannerWidth,
+                              marginLeft: index === 0 ? 16 : 0,
+                              marginRight: 16,
+                            },
+                          ]}
+                          onPress={() => handleBannerPress(banner)}
+                          activeOpacity={banner.link ? 0.9 : 1}
+                          disabled={!banner.link}
+                        >
+                          <Image source={{ uri: banner.image }} style={styles.bannerImage} />
+                          <View style={styles.bannerOverlay}>
+                            {banner.badge && (
+                              <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{banner.badge}</Text>
+                              </View>
+                            )}
+                            <Text style={styles.bannerTitle}>{banner.title}</Text>
+                            <Text style={styles.bannerSubtitle}>{banner.subtitle}</Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                    {renderBannerDots()}
                   </View>
-                </View>
+
+                  {/* Section Banner before Recently Viewed */}
+                  {HomepageSectionBanners.filter(b => b.position === 'before-recently-viewed').map(
+                    ({ banner }) => (
+                      <SectionBanner
+                        key={banner.id}
+                        banner={banner}
+                        width={layout.constrainedWidth}
+                      />
+                    )
+                  )}
+
+                  {/* Recently Viewed Section */}
+                  <RecentlyViewedSection
+                    products={recentlyViewedProducts}
+                    baseUrl={baseUrl}
+                    isInWishlist={isInWishlist}
+                    onToggleWishlist={toggleWishlist}
+                    cardWidth={layout.cardWidth}
+                    isLoading={loadingRecentlyViewed}
+                  />
+
+                  {/* Section Banner after Recently Viewed */}
+                  {HomepageSectionBanners.filter(b => b.position === 'after-recently-viewed').map(
+                    ({ banner }) => (
+                      <SectionBanner
+                        key={banner.id}
+                        banner={banner}
+                        width={layout.constrainedWidth}
+                      />
+                    )
+                  )}
+
+                  {/* Featured Products Section */}
+                  <FeaturedProductsSection
+                    products={featuredProductsData}
+                    baseUrl={baseUrl}
+                    isInWishlist={isInWishlist}
+                    onToggleWishlist={toggleWishlist}
+                    cardWidth={layout.cardWidth}
+                    isLoading={loadingFeaturedProducts}
+                  />
+
+                  {/* Section Banner after Featured Products */}
+                  {HomepageSectionBanners.filter(b => b.position === 'after-featured').map(
+                    ({ banner }) => (
+                      <SectionBanner
+                        key={banner.id}
+                        banner={banner}
+                        width={layout.constrainedWidth}
+                      />
+                    )
+                  )}
+
+                  {/* New Arrival Section */}
+                  <NewArrivalSection
+                    products={newArrivalProductsData}
+                    baseUrl={baseUrl}
+                    isInWishlist={isInWishlist}
+                    onToggleWishlist={toggleWishlist}
+                    cardWidth={layout.cardWidth}
+                    isLoading={loadingNewArrivalProducts}
+                  />
+
+                  {/* Section Banner after New Arrival */}
+                  {HomepageSectionBanners.filter(b => b.position === 'after-new-arrival').map(
+                    ({ banner }) => (
+                      <SectionBanner
+                        key={banner.id}
+                        banner={banner}
+                        width={layout.constrainedWidth}
+                      />
+                    )
+                  )}
+
+                  {/* Section Banner after Trending */}
+                  {HomepageSectionBanners.filter(b => b.position === 'after-all').map(
+                    ({ banner }) => (
+                      <SectionBanner
+                        key={banner.id}
+                        banner={banner}
+                        width={layout.constrainedWidth}
+                      />
+                    )
+                  )}
+                </>
               )}
 
-              {!loadingCatalogProducts && !catalogProductsError && catalogProducts.length === 0 && (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>No products found in this category</Text>
-                </View>
-              )}
+              {/* CATALOG Tab Content */}
+              {activeTab === 'catalog' && (
+                <>
+                  {/* Categories */}
+                  <View style={styles.categoriesSection}>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.categoriesScroll}
+                    >
+                      {categories.map(category => (
+                        <TouchableOpacity
+                          key={category.id}
+                          style={[
+                            styles.categoryChip,
+                            selectedCategory === category.id && styles.categoryChipActive,
+                          ]}
+                          onPress={() => handleCategorySelect(category.id)}
+                        >
+                          <Text
+                            style={[
+                              styles.categoryChipText,
+                              selectedCategory === category.id && styles.categoryChipTextActive,
+                            ]}
+                          >
+                            {category.attributes.title}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
 
-              {!loadingCatalogProducts && !catalogProductsError && catalogProducts.length > 0 && (
-                <View style={styles.productsGrid}>
-                  {catalogProducts.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      baseUrl={baseUrl}
-                      isInWishlist={isInWishlist(product.id)}
-                      onToggleWishlist={toggleWishlist}
-                      width={layout.cardWidth}
-                    />
-                  ))}
-                </View>
+                  {/* Catalog Products Section */}
+                  <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>
+                      {selectedCategory
+                        ? categories.find(c => c.id === selectedCategory)?.attributes.title ||
+                          'Products'
+                        : 'All Products'}
+                    </Text>
+
+                    {/* Category Description - Between title and products */}
+                    {selectedCategory &&
+                      (() => {
+                        const currentCategory = categories.find(c => c.id === selectedCategory);
+                        const description =
+                          currentCategory?.attributes?.shortDescription ||
+                          currentCategory?.attributes?.description;
+
+                        if (description) {
+                          return (
+                            <View style={styles.categoryDescriptionSection}>
+                              <HtmlRenderer html={description} />
+                            </View>
+                          );
+                        }
+                        return null;
+                      })()}
+
+                    {loadingCatalogProducts && (
+                      <View style={styles.productsGrid}>
+                        {Array.from({ length: 10 }).map((_, index) => (
+                          <ProductCardSkeleton key={`skeleton-${index}`} width={layout.cardWidth} />
+                        ))}
+                      </View>
+                    )}
+
+                    {catalogProductsError && (
+                      <View style={styles.errorContainer}>
+                        <View style={styles.errorContent}>
+                          <View style={styles.errorTextContainer}>
+                            <Text style={styles.errorText}>Error loading products</Text>
+                            <Text style={styles.errorDetail}>{catalogProductsError}</Text>
+                          </View>
+                          <TouchableOpacity
+                            style={styles.reloadIconButton}
+                            onPress={refetchCatalogProducts}
+                          >
+                            <RefreshCw size={24} color={ShopColors.primary} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+
+                    {!loadingCatalogProducts &&
+                      !catalogProductsError &&
+                      catalogProducts.length === 0 && (
+                        <View style={styles.emptyContainer}>
+                          <Text style={styles.emptyText}>No products found in this category</Text>
+                        </View>
+                      )}
+
+                    {!loadingCatalogProducts &&
+                      !catalogProductsError &&
+                      catalogProducts.length > 0 && (
+                        <View style={styles.productsGrid}>
+                          {catalogProducts.map(product => (
+                            <ProductCard
+                              key={product.id}
+                              product={product}
+                              baseUrl={baseUrl}
+                              isInWishlist={isInWishlist(product.id)}
+                              onToggleWishlist={toggleWishlist}
+                              width={layout.cardWidth}
+                            />
+                          ))}
+                        </View>
+                      )}
+                  </View>
+                </>
               )}
             </View>
-          </>
+          </ScrollView>
         )}
-
-        </View>
-      </ScrollView>
-        )
-      }
       </View>
     </SafeAreaView>
   );

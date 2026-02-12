@@ -40,8 +40,8 @@ const getOrderStatusText = (order: IOrder): string => {
   const statusRelationship = (order as any).relationships?.status?.data;
   if (statusRelationship && statusRelationship.id) {
     const included = (order as any).included || [];
-    const statusData = included.find((item: any) =>
-      item.type === 'orderstatuses' && item.id === statusRelationship.id
+    const statusData = included.find(
+      (item: any) => item.type === 'orderstatuses' && item.id === statusRelationship.id
     );
     if (statusData?.attributes?.name) {
       return statusData.attributes.name;
@@ -65,7 +65,11 @@ const getStatusColorByText = (statusText: string) => {
     return '#2196F3';
   } else if (statusLower.includes('shipped') || statusLower.includes('sent')) {
     return ShopColors.primary;
-  } else if (statusLower.includes('closed') || statusLower.includes('delivered') || statusLower.includes('complete')) {
+  } else if (
+    statusLower.includes('closed') ||
+    statusLower.includes('delivered') ||
+    statusLower.includes('complete')
+  ) {
     return ShopColors.success;
   } else if (statusLower.includes('cancelled') || statusLower.includes('canceled')) {
     return ShopColors.error;
@@ -75,11 +79,19 @@ const getStatusColorByText = (statusText: string) => {
 
 const getPaymentStatusColor = (paymentStatus: string) => {
   const statusLower = paymentStatus.toLowerCase();
-  if (statusLower.includes('paid') || statusLower.includes('completed') || statusLower.includes('authorized')) {
+  if (
+    statusLower.includes('paid') ||
+    statusLower.includes('completed') ||
+    statusLower.includes('authorized')
+  ) {
     return ShopColors.success;
   } else if (statusLower.includes('pending') || statusLower.includes('processing')) {
     return '#FF9800';
-  } else if (statusLower.includes('failed') || statusLower.includes('declined') || statusLower.includes('cancelled')) {
+  } else if (
+    statusLower.includes('failed') ||
+    statusLower.includes('declined') ||
+    statusLower.includes('cancelled')
+  ) {
     return ShopColors.error;
   } else if (statusLower.includes('refund')) {
     return '#9C27B0';
@@ -97,10 +109,10 @@ const getPaymentFilterLabel = (value: string): string => {
 
 const getTimeFilterLabel = (value: string): string => {
   const timeLabels: Record<string, string> = {
-    'all': 'All Time',
+    all: 'All Time',
     '30days': 'Last 30 Days',
     '90days': 'Last 90 Days',
-    'year': 'This Year',
+    year: 'This Year',
   };
   return timeLabels[value] || value;
 };
@@ -135,12 +147,7 @@ const SkeletonImage = () => {
 
   return (
     <View style={styles.skeletonImage}>
-      <Animated.View
-        style={[
-          styles.skeletonShimmer,
-          { opacity }
-        ]}
-      />
+      <Animated.View style={[styles.skeletonShimmer, { opacity }]} />
     </View>
   );
 };
@@ -155,10 +162,14 @@ export default function OrdersScreen() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [timeFilter, setTimeFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'id-desc' | 'id-asc'>('date-desc');
+  const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'id-desc' | 'id-asc'>(
+    'date-desc'
+  );
 
   const [appliedStatusFilter, setAppliedStatusFilter] = useState<string>('all');
-  const [appliedSortBy, setAppliedSortBy] = useState<'date-desc' | 'date-asc' | 'id-desc' | 'id-asc'>('date-desc');
+  const [appliedSortBy, setAppliedSortBy] = useState<
+    'date-desc' | 'date-asc' | 'id-desc' | 'id-asc'
+  >('date-desc');
 
   const handleApplySearch = () => {
     setDebouncedSearchQuery(searchQuery);
@@ -191,10 +202,14 @@ export default function OrdersScreen() {
 
     const params: any = {
       page: { number: 1, size: 3 },
-      sort: appliedSortBy === 'date-desc' ? '-createdAt' :
-            appliedSortBy === 'date-asc' ? 'createdAt' :
-            appliedSortBy === 'id-desc' ? '-id' :
-            'id',
+      sort:
+        appliedSortBy === 'date-desc'
+          ? '-createdAt'
+          : appliedSortBy === 'date-asc'
+            ? 'createdAt'
+            : appliedSortBy === 'id-desc'
+              ? '-id'
+              : 'id',
       include: 'lineItems,lineItems.product',
     };
 
@@ -313,13 +328,23 @@ export default function OrdersScreen() {
 
     if (paymentFilter !== 'all') {
       filtered = filtered.filter(order => {
-        const paymentStatus = ((order.attributes as any)?.paymentStatus?.label || 'pending').toLowerCase();
+        const paymentStatus = (
+          (order.attributes as any)?.paymentStatus?.label || 'pending'
+        ).toLowerCase();
         if (paymentFilter === 'paid') {
-          return paymentStatus.includes('paid') || paymentStatus.includes('completed') || paymentStatus.includes('authorized');
+          return (
+            paymentStatus.includes('paid') ||
+            paymentStatus.includes('completed') ||
+            paymentStatus.includes('authorized')
+          );
         } else if (paymentFilter === 'pending') {
           return paymentStatus.includes('pending') || paymentStatus.includes('unpaid');
         } else if (paymentFilter === 'failed') {
-          return paymentStatus.includes('failed') || paymentStatus.includes('declined') || paymentStatus.includes('cancelled');
+          return (
+            paymentStatus.includes('failed') ||
+            paymentStatus.includes('declined') ||
+            paymentStatus.includes('cancelled')
+          );
         }
         return true;
       });
@@ -416,7 +441,7 @@ export default function OrdersScreen() {
               `${cleanBaseUrl}/api/products/${productId}?include=images`,
               {
                 headers: {
-                  'Authorization': `Bearer ${await getValidAccessToken()}`,
+                  Authorization: `Bearer ${await getValidAccessToken()}`,
                   'Content-Type': 'application/vnd.api+json',
                 },
               }
@@ -443,14 +468,17 @@ export default function OrdersScreen() {
               if (data.included) {
                 data.included.forEach((item: any) => {
                   if (item.type === 'productimages' && item.attributes?.files) {
-                    const mainFile = item.attributes.files.find((file: any) =>
-                      file.types?.includes('main') &&
-                      (file.dimension === 'product_small' || file.dimension === 'product_medium')
+                    const mainFile = item.attributes.files.find(
+                      (file: any) =>
+                        file.types?.includes('main') &&
+                        (file.dimension === 'product_small' || file.dimension === 'product_medium')
                     );
 
                     if (mainFile?.url) {
                       const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-                      const cleanImageUrl = mainFile.url.startsWith('/') ? mainFile.url : `/${mainFile.url}`;
+                      const cleanImageUrl = mainFile.url.startsWith('/')
+                        ? mainFile.url
+                        : `/${mainFile.url}`;
                       const fullUrl = `${cleanBaseUrl}${cleanImageUrl}`;
 
                       // Add a small delay before marking as loaded for progressive effect
@@ -482,7 +510,6 @@ export default function OrdersScreen() {
     fetchProductImages();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allOrders, baseUrl, getValidAccessToken]);
-
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -630,8 +657,10 @@ export default function OrdersScreen() {
       let imageUrl = null;
 
       if (mainImageData.attributes?.files && mainImageData.attributes.files.length > 0) {
-        const mainFile = mainImageData.attributes.files.find((file: any) =>
-          file.types?.includes('main') && (file.dimension === 'product_small' || file.dimension === 'product_medium')
+        const mainFile = mainImageData.attributes.files.find(
+          (file: any) =>
+            file.types?.includes('main') &&
+            (file.dimension === 'product_small' || file.dimension === 'product_medium')
         );
 
         if (mainFile) {
@@ -686,16 +715,19 @@ export default function OrdersScreen() {
 
     const orderToUse = detailedOrder || order;
 
-    const paymentStatus = (orderToUse.attributes as any)?.paymentStatus?.label ||
-                         (detailedOrder ? 'Pending payment' : '...');
+    const paymentStatus =
+      (orderToUse.attributes as any)?.paymentStatus?.label ||
+      (detailedOrder ? 'Pending payment' : '...');
 
-    const paymentMethod = (orderToUse.attributes as any)?.paymentMethod?.[0]?.label ||
-                         (detailedOrder ? 'N/A' : '...');
+    const paymentMethod =
+      (orderToUse.attributes as any)?.paymentMethod?.[0]?.label || (detailedOrder ? 'N/A' : '...');
 
     // Determine if order is shipped
-    const shippingStatus = orderStatus.toLowerCase().includes('shipped') || orderStatus.toLowerCase().includes('delivered')
-      ? 'Shipped'
-      : 'Not Shipped';
+    const shippingStatus =
+      orderStatus.toLowerCase().includes('shipped') ||
+      orderStatus.toLowerCase().includes('delivered')
+        ? 'Shipped'
+        : 'Not Shipped';
 
     const productImages = getProductImages(order);
     const imagesPerRow = 4;
@@ -715,13 +747,18 @@ export default function OrdersScreen() {
             <Text style={styles.orderDate}>{orderDate}</Text>
           </View>
           <View style={styles.orderHeaderRight}>
-            <View style={[styles.statusBadge, { backgroundColor: getStatusColorByText(orderStatus) + '20' }]}>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: getStatusColorByText(orderStatus) + '20' },
+              ]}
+            >
               <Text style={[styles.statusText, { color: getStatusColorByText(orderStatus) }]}>
                 {orderStatus}
               </Text>
             </View>
             <TouchableOpacity
-              onPress={(e) => {
+              onPress={e => {
                 e.stopPropagation();
                 toggleOrderExpansion(order.id);
               }}
@@ -776,7 +813,11 @@ export default function OrdersScreen() {
         <View style={styles.orderTotalRow}>
           <Text style={styles.orderTotalLabel}>Total:</Text>
           <Text style={styles.orderTotalValue}>
-            {order.attributes.currency === 'USD' ? '$' : order.attributes.currency === 'EUR' ? '€' : '£'}
+            {order.attributes.currency === 'USD'
+              ? '$'
+              : order.attributes.currency === 'EUR'
+                ? '€'
+                : '£'}
             {totalValue.toFixed(2)}
           </Text>
         </View>
@@ -800,10 +841,9 @@ export default function OrdersScreen() {
 
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Payment:</Text>
-                  <Text style={[
-                    styles.detailValue,
-                    { color: getPaymentStatusColor(paymentStatus) }
-                  ]}>
+                  <Text
+                    style={[styles.detailValue, { color: getPaymentStatusColor(paymentStatus) }]}
+                  >
                     {paymentStatus}
                   </Text>
                 </View>
@@ -812,20 +852,30 @@ export default function OrdersScreen() {
                   <CreditCard size={14} color={ShopColors.textSecondary} />
                   <Text style={[styles.detailLabel, { marginLeft: 8 }]}>Payment Method:</Text>
                   <View style={styles.paymentMethodContainer}>
-                    <Text style={styles.detailValue}>
-                      {paymentMethod}
-                    </Text>
+                    <Text style={styles.detailValue}>{paymentMethod}</Text>
                   </View>
                 </View>
 
                 <View style={styles.detailRow}>
-                  <Truck size={14} color={shippingStatus === 'Shipped' ? ShopColors.success : ShopColors.textSecondary} />
+                  <Truck
+                    size={14}
+                    color={
+                      shippingStatus === 'Shipped' ? ShopColors.success : ShopColors.textSecondary
+                    }
+                  />
                   <Text style={[styles.detailLabel, { marginLeft: 8 }]}>Shipping Status:</Text>
                   <View style={styles.shippingStatusContainer}>
-                    <Text style={[
-                      styles.detailValue,
-                      { color: shippingStatus === 'Shipped' ? ShopColors.success : ShopColors.textSecondary }
-                    ]}>
+                    <Text
+                      style={[
+                        styles.detailValue,
+                        {
+                          color:
+                            shippingStatus === 'Shipped'
+                              ? ShopColors.success
+                              : ShopColors.textSecondary,
+                        },
+                      ]}
+                    >
                       {shippingStatus}
                     </Text>
                   </View>
@@ -894,11 +944,12 @@ export default function OrdersScreen() {
   }
 
   if (error && isAuthenticated) {
-    const hasFiltersInError = debouncedSearchQuery.trim() !== '' ||
-                              appliedStatusFilter !== 'all' ||
-                              paymentFilter !== 'all' ||
-                              timeFilter !== 'all' ||
-                              appliedSortBy !== 'date-desc';
+    const hasFiltersInError =
+      debouncedSearchQuery.trim() !== '' ||
+      appliedStatusFilter !== 'all' ||
+      paymentFilter !== 'all' ||
+      timeFilter !== 'all' ||
+      appliedSortBy !== 'date-desc';
 
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -916,11 +967,7 @@ export default function OrdersScreen() {
               <Package size={48} color={ShopColors.error} />
               <Text style={[styles.loadingText, { color: ShopColors.error }]}>{error}</Text>
               <View style={styles.errorButtonsContainer}>
-                <TouchableOpacity
-                  style={styles.retryButton}
-                  onPress={refetch}
-                  activeOpacity={0.7}
-                >
+                <TouchableOpacity style={styles.retryButton} onPress={refetch} activeOpacity={0.7}>
                   <Text style={styles.retryButtonText}>Retry</Text>
                 </TouchableOpacity>
                 {hasFiltersInError && (
@@ -942,11 +989,12 @@ export default function OrdersScreen() {
     );
   }
 
-  const hasAnyFilters = debouncedSearchQuery.trim() !== '' ||
-                        appliedStatusFilter !== 'all' ||
-                        paymentFilter !== 'all' ||
-                        timeFilter !== 'all' ||
-                        appliedSortBy !== 'date-desc';
+  const hasAnyFilters =
+    debouncedSearchQuery.trim() !== '' ||
+    appliedStatusFilter !== 'all' ||
+    paymentFilter !== 'all' ||
+    timeFilter !== 'all' ||
+    appliedSortBy !== 'date-desc';
 
   if (orders.length === 0 && !hasAnyFilters && !loading) {
     return (
@@ -974,9 +1022,7 @@ export default function OrdersScreen() {
             >
               <Package size={80} color={ShopColors.textSecondary} />
               <Text style={styles.emptyTitle}>No orders yet</Text>
-              <Text style={styles.emptyText}>
-                When you place orders, they will appear here.
-              </Text>
+              <Text style={styles.emptyText}>When you place orders, they will appear here.</Text>
               <TouchableOpacity
                 style={styles.shopButton}
                 onPress={() => router.push('/(tabs)')}
@@ -1004,10 +1050,7 @@ export default function OrdersScreen() {
         <View style={styles.contentWrapper}>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>My Orders</Text>
-            <TouchableOpacity
-              style={styles.refreshButton}
-              onPress={refetch}
-            >
+            <TouchableOpacity style={styles.refreshButton} onPress={refetch}>
               <RefreshCw size={20} color={ShopColors.primary} />
             </TouchableOpacity>
           </View>
@@ -1025,10 +1068,12 @@ export default function OrdersScreen() {
                 returnKeyType="search"
               />
               {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => {
-                  setSearchQuery('');
-                  setDebouncedSearchQuery('');
-                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchQuery('');
+                    setDebouncedSearchQuery('');
+                  }}
+                >
                   <X size={18} color={ShopColors.textSecondary} />
                 </TouchableOpacity>
               )}
@@ -1045,16 +1090,26 @@ export default function OrdersScreen() {
             <TouchableOpacity
               style={[
                 styles.filterButton,
-                (appliedStatusFilter !== 'all' || paymentFilter !== 'all' || timeFilter !== 'all' || appliedSortBy !== 'date-desc') && styles.filterButtonActive
+                (appliedStatusFilter !== 'all' ||
+                  paymentFilter !== 'all' ||
+                  timeFilter !== 'all' ||
+                  appliedSortBy !== 'date-desc') &&
+                  styles.filterButtonActive,
               ]}
               onPress={handleOpenDrawer}
               activeOpacity={0.7}
             >
-              <Filter size={20} color={
-                (appliedStatusFilter !== 'all' || paymentFilter !== 'all' || timeFilter !== 'all' || appliedSortBy !== 'date-desc')
-                  ? '#FFFFFF'
-                  : ShopColors.primary
-              } />
+              <Filter
+                size={20}
+                color={
+                  appliedStatusFilter !== 'all' ||
+                  paymentFilter !== 'all' ||
+                  timeFilter !== 'all' ||
+                  appliedSortBy !== 'date-desc'
+                    ? '#FFFFFF'
+                    : ShopColors.primary
+                }
+              />
             </TouchableOpacity>
           </View>
 
@@ -1099,12 +1154,11 @@ export default function OrdersScreen() {
             </View>
           )}
 
-
           {/* Orders FlatList with Infinite Scroll */}
           <FlatList
             data={filteredOrders}
             renderItem={renderOrderItem}
-            keyExtractor={(order) => order.id}
+            keyExtractor={order => order.id}
             ListEmptyComponent={
               <View style={styles.noResultsContainer}>
                 <Package size={60} color={ShopColors.textSecondary} />
@@ -1123,8 +1177,7 @@ export default function OrdersScreen() {
                   <Text style={styles.loadingMoreText}>Loading more orders...</Text>
                 </View>
               ) : allOrders.length > 0 ? (
-                <View style={styles.endOfList}>
-                </View>
+                <View style={styles.endOfList}></View>
               ) : null
             }
             refreshControl={
@@ -1154,8 +1207,8 @@ export default function OrdersScreen() {
                   style={[
                     styles.drawerContainer,
                     {
-                      transform: [{ translateX: slideAnim }]
-                    }
+                      transform: [{ translateX: slideAnim }],
+                    },
                   ]}
                   {...panResponder.panHandlers}
                 >
@@ -1189,12 +1242,21 @@ export default function OrdersScreen() {
                             <ChevronDown
                               size={20}
                               color={ShopColors.textSecondary}
-                              style={{ transform: [{ rotate: statusExpanded ? '180deg' : '0deg' }] }}
+                              style={{
+                                transform: [{ rotate: statusExpanded ? '180deg' : '0deg' }],
+                              }}
                             />
                           </TouchableOpacity>
                           {statusExpanded && (
                             <View style={styles.selectOptions}>
-                              {['all', 'open', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+                              {[
+                                'all',
+                                'open',
+                                'processing',
+                                'shipped',
+                                'delivered',
+                                'cancelled',
+                              ].map(status => (
                                 <TouchableOpacity
                                   key={status}
                                   style={styles.selectOption}
@@ -1204,10 +1266,12 @@ export default function OrdersScreen() {
                                   }}
                                   activeOpacity={0.7}
                                 >
-                                  <Text style={[
-                                    styles.selectOptionText,
-                                    statusFilter === status && styles.selectOptionTextActive
-                                  ]}>
+                                  <Text
+                                    style={[
+                                      styles.selectOptionText,
+                                      statusFilter === status && styles.selectOptionTextActive,
+                                    ]}
+                                  >
                                     {getStatusFilterLabel(status)}
                                   </Text>
                                   {statusFilter === status && (
@@ -1235,12 +1299,14 @@ export default function OrdersScreen() {
                             <ChevronDown
                               size={20}
                               color={ShopColors.textSecondary}
-                              style={{ transform: [{ rotate: paymentExpanded ? '180deg' : '0deg' }] }}
+                              style={{
+                                transform: [{ rotate: paymentExpanded ? '180deg' : '0deg' }],
+                              }}
                             />
                           </TouchableOpacity>
                           {paymentExpanded && (
                             <View style={styles.selectOptions}>
-                              {['all', 'paid', 'pending', 'failed'].map((payment) => (
+                              {['all', 'paid', 'pending', 'failed'].map(payment => (
                                 <TouchableOpacity
                                   key={payment}
                                   style={styles.selectOption}
@@ -1250,10 +1316,12 @@ export default function OrdersScreen() {
                                   }}
                                   activeOpacity={0.7}
                                 >
-                                  <Text style={[
-                                    styles.selectOptionText,
-                                    paymentFilter === payment && styles.selectOptionTextActive
-                                  ]}>
+                                  <Text
+                                    style={[
+                                      styles.selectOptionText,
+                                      paymentFilter === payment && styles.selectOptionTextActive,
+                                    ]}
+                                  >
                                     {getPaymentFilterLabel(payment)}
                                   </Text>
                                   {paymentFilter === payment && (
@@ -1291,7 +1359,7 @@ export default function OrdersScreen() {
                                 { value: '30days', label: 'Last 30 Days' },
                                 { value: '90days', label: 'Last 90 Days' },
                                 { value: 'year', label: 'This Year' },
-                              ].map((time) => (
+                              ].map(time => (
                                 <TouchableOpacity
                                   key={time.value}
                                   style={styles.selectOption}
@@ -1301,10 +1369,12 @@ export default function OrdersScreen() {
                                   }}
                                   activeOpacity={0.7}
                                 >
-                                  <Text style={[
-                                    styles.selectOptionText,
-                                    timeFilter === time.value && styles.selectOptionTextActive
-                                  ]}>
+                                  <Text
+                                    style={[
+                                      styles.selectOptionText,
+                                      timeFilter === time.value && styles.selectOptionTextActive,
+                                    ]}
+                                  >
                                     {time.label}
                                   </Text>
                                   {timeFilter === time.value && (
@@ -1327,7 +1397,7 @@ export default function OrdersScreen() {
                             { value: 'date-asc', label: 'Oldest First' },
                             { value: 'id-desc', label: 'Order ID: High to Low' },
                             { value: 'id-asc', label: 'Order ID: Low to High' },
-                          ].map((sort) => (
+                          ].map(sort => (
                             <TouchableOpacity
                               key={sort.value}
                               style={styles.drawerOption}
@@ -1335,18 +1405,22 @@ export default function OrdersScreen() {
                               activeOpacity={0.7}
                             >
                               <View style={styles.radioButton}>
-                                <View style={[
-                                  styles.radioButtonOuter,
-                                  sortBy === sort.value && styles.radioButtonOuterActive
-                                ]}>
+                                <View
+                                  style={[
+                                    styles.radioButtonOuter,
+                                    sortBy === sort.value && styles.radioButtonOuterActive,
+                                  ]}
+                                >
                                   {sortBy === sort.value && (
                                     <View style={styles.radioButtonInner} />
                                   )}
                                 </View>
-                                <Text style={[
-                                  styles.drawerOptionText,
-                                  sortBy === sort.value && styles.drawerOptionTextActive
-                                ]}>
+                                <Text
+                                  style={[
+                                    styles.drawerOptionText,
+                                    sortBy === sort.value && styles.drawerOptionTextActive,
+                                  ]}
+                                >
                                   {sort.label}
                                 </Text>
                               </View>
@@ -1357,7 +1431,10 @@ export default function OrdersScreen() {
 
                       {/* Clear and Apply Buttons */}
                       <View style={styles.drawerFooter}>
-                        {(statusFilter !== 'all' || paymentFilter !== 'all' || timeFilter !== 'all' || sortBy !== 'date-desc') && (
+                        {(statusFilter !== 'all' ||
+                          paymentFilter !== 'all' ||
+                          timeFilter !== 'all' ||
+                          sortBy !== 'date-desc') && (
                           <TouchableOpacity
                             style={styles.clearButton}
                             onPress={clearAllFilters}
@@ -1374,9 +1451,7 @@ export default function OrdersScreen() {
                           }}
                           activeOpacity={0.7}
                         >
-                          <Text style={styles.applyButtonText}>
-                            Apply
-                          </Text>
+                          <Text style={styles.applyButtonText}>Apply</Text>
                         </TouchableOpacity>
                       </View>
                     </ScrollView>
