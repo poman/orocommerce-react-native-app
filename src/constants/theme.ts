@@ -34,7 +34,7 @@ export const ShopColors = {
   border: '#E5E7EB',
   error: '#EF4444',
   success: '#10B981',
-  warning: '#F59E0B',
+  warning: '#93703a',
   sale: '#EF4444',
   tabIconDefault: '#9CA3AF',
   tabIconSelected: '#2196F3',
