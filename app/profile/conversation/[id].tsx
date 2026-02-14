@@ -15,6 +15,7 @@ import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { showToast } from '@/src/utils/toast';
 import api, { initializeApi, setAuthTokenGetter } from '@/src/api/api';
+import { TopMainMenu } from '@/src/components/TopMainMenu';
 
 interface Message {
   id: string;
@@ -32,14 +33,19 @@ interface ConversationDetail {
   id: string;
   type: string;
   attributes: {
-    subject?: string;
-    status?: string;
+    name?: string;
+    messagesNumber?: number;
     createdAt?: string;
     updatedAt?: string;
+    sourceTitle?: string;
+    sourceUrl?: string;
   };
   relationships?: {
     messages?: {
       data: Array<{ type: string; id: string }>;
+    };
+    status?: {
+      data: { type: string; id: string } | null;
     };
   };
 }
@@ -52,6 +58,7 @@ export default function ConversationDetailScreen() {
 
   const [conversation, setConversation] = useState<ConversationDetail | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [status, setStatus] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,22 +83,31 @@ export default function ConversationDetailScreen() {
       initializeApi(baseUrl);
       setAuthTokenGetter(getValidAccessToken);
 
-      // Fetch conversation details with messages
       try {
         const response = await api.get<{
           data: ConversationDetail;
-          included?: Message[];
-        }>(`/conversations/${id}?include=messages`);
+          included?: any[];
+        }>(`/conversations/${id}?include=messages,status`);
 
         if (response.data.data) {
           setConversation(response.data.data);
 
-          // Extract messages from included data
           if (response.data.included) {
             const messagesList = response.data.included.filter(
-              (item: any) => item.type === 'messages' || item.type === 'conversationmessages'
+              (item: any) => item.type === 'conversationmessages'
             );
             setMessages(messagesList as Message[]);
+
+            const statusItem = response.data.included.find(
+              (item: any) => item.type === 'conversationstatuses'
+            );
+            if (statusItem) {
+              setStatus(statusItem.id || statusItem.attributes?.name || '');
+            }
+          }
+
+          if (response.data.data.relationships?.status?.data) {
+            setStatus(response.data.data.relationships.status.data.id);
           }
         }
       } catch (_apiError: any) {
@@ -119,6 +135,11 @@ export default function ConversationDetailScreen() {
     } catch {
       return '';
     }
+  };
+
+  const stripHtmlTags = (html?: string) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>/g, '').trim();
   };
 
   const getStatusColor = (status?: string) => {
@@ -157,7 +178,7 @@ export default function ConversationDetailScreen() {
         </View>
 
         {message.attributes.body && (
-          <Text style={styles.messageBody}>{message.attributes.body}</Text>
+          <Text style={styles.messageBody}>{stripHtmlTags(message.attributes.body)}</Text>
         )}
       </View>
     );
@@ -168,15 +189,17 @@ export default function ConversationDetailScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.push('/profile/my-conversations')}
+          >
             <ArrowLeft size={24} color={ShopColors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {conversation?.attributes.subject || 'Conversation'}
+            {conversation?.attributes.name || 'Conversation'}
           </Text>
-          <View style={styles.placeholder} />
+          <TopMainMenu />
         </View>
 
         {/* Content */}
@@ -206,26 +229,21 @@ export default function ConversationDetailScreen() {
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Subject:</Text>
                   <Text style={styles.infoValue}>
-                    {conversation.attributes.subject || `Conversation #${conversation.id}`}
+                    {conversation.attributes.name || `Conversation #${conversation.id}`}
                   </Text>
                 </View>
 
-                {conversation.attributes.status && (
+                {status && (
                   <View style={styles.infoRow}>
                     <Text style={styles.infoLabel}>Status:</Text>
                     <View
                       style={[
                         styles.statusBadge,
-                        { backgroundColor: getStatusColor(conversation.attributes.status) + '20' },
+                        { backgroundColor: getStatusColor(status) + '20' },
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.statusText,
-                          { color: getStatusColor(conversation.attributes.status) },
-                        ]}
-                      >
-                        {conversation.attributes.status}
+                      <Text style={[styles.statusText, { color: getStatusColor(status) }]}>
+                        {status}
                       </Text>
                     </View>
                   </View>
@@ -237,6 +255,13 @@ export default function ConversationDetailScreen() {
                     <Text style={styles.infoValue}>
                       {formatDate(conversation.attributes.createdAt)}
                     </Text>
+                  </View>
+                )}
+
+                {conversation.attributes.messagesNumber !== undefined && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Messages:</Text>
+                    <Text style={styles.infoValue}>{conversation.attributes.messagesNumber}</Text>
                   </View>
                 )}
               </View>
