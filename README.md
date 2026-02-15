@@ -144,41 +144,7 @@ After copying `app.json.example` to `app.json`, update these key sections:
 }
 ```
 
-#### 2. iOS Configuration
-
-```json
-{
-  "expo": {
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.yourapp"
-    }
-  }
-}
-```
-
-**⚠️ Important:** Change `com.yourcompany.yourapp` to your unique bundle identifier (e.g., `com.acme.storefrontapp`)
-
-#### 3. Android Configuration
-
-```json
-{
-  "expo": {
-    "android": {
-      "versionCode": 1,
-      "package": "com.yourcompany.yourapp",
-      "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF",
-        "foregroundImage": "./assets/icon.png"
-      }
-    }
-  }
-}
-```
-
-**⚠️ Important:** Change `com.yourcompany.yourapp` to your unique package name
-
-#### 4. OroCommerce API Configuration
+#### 2. OroCommerce API Configuration
 
 ```json
 {
