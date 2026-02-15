@@ -52,15 +52,30 @@ export default function HomeScreen() {
   const [loadingRecentlyViewed, setLoadingRecentlyViewed] = useState(false);
   const [wizardJustCompleted, setWizardJustCompleted] = useState(false);
 
-  const { error, refetch } = useProducts(
-    {
+  const baseProductsParams = React.useMemo(
+    () => ({
       page: { number: 1, size: 10 },
       sort: '-id',
       include: 'images,inventoryStatus',
-    },
+    }),
+    []
+  );
+
+  const { error, refetch } = useProducts(
+    baseProductsParams,
     baseUrl,
     getValidAccessToken,
     refreshAccessToken
+  );
+
+  const featuredProductsParams = React.useMemo(
+    () => ({
+      page: { number: 1, size: AppConfig.featuredProducts.maxProducts },
+      sort: '-updatedAt',
+      filter: { featured: 'true' },
+      include: 'images,inventoryStatus',
+    }),
+    []
   );
 
   const {
@@ -69,15 +84,20 @@ export default function HomeScreen() {
     products: featuredProductsData,
     refetch: refetchFeaturedProducts,
   } = useProducts(
-    {
-      page: { number: 1, size: AppConfig.featuredProducts.maxProducts },
-      sort: '-updatedAt',
-      filter: { featured: 'true' },
-      include: 'images,inventoryStatus',
-    },
+    featuredProductsParams,
     baseUrl,
     getValidAccessToken,
     refreshAccessToken
+  );
+
+  const newArrivalProductsParams = React.useMemo(
+    () => ({
+      page: { number: 1, size: AppConfig.newArrival.maxProducts },
+      sort: '-updatedAt',
+      filter: { newArrival: 'true' },
+      include: 'images,inventoryStatus',
+    }),
+    []
   );
 
   const {
@@ -86,21 +106,21 @@ export default function HomeScreen() {
     products: newArrivalProductsData,
     refetch: refetchNewArrivalProducts,
   } = useProducts(
-    {
-      page: { number: 1, size: AppConfig.newArrival.maxProducts },
-      sort: '-updatedAt',
-      filter: { newArrival: 'true' },
-      include: 'images,inventoryStatus',
-    },
+    newArrivalProductsParams,
     baseUrl,
     getValidAccessToken,
     refreshAccessToken
   );
 
-  const { categories, refetch: refetchCategories } = useCategories(
-    {
+  const categoriesParams = React.useMemo(
+    () => ({
       page: { number: 1, size: 100 },
-    },
+    }),
+    []
+  );
+
+  const { categories, refetch: refetchCategories } = useCategories(
+    categoriesParams,
     baseUrl,
     getValidAccessToken,
     refreshAccessToken
