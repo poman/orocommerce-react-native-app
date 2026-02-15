@@ -80,6 +80,7 @@ interface ConfigContextType {
   hasConfigured: boolean;
   isReady: boolean;
   isConfigValid: boolean;
+  shouldShowWizard: boolean;
   setBaseUrl: (url: string) => Promise<void>;
   setOAuthCredentials: (clientId: string, clientSecret: string) => Promise<void>;
   clearBaseUrl: () => Promise<void>;
@@ -198,6 +199,8 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
       oauthClientSecret
     );
 
+    const shouldShowWizard = isUsingPlaceholderFallback || false;
+
     return {
       baseUrl,
       oauthClientId,
@@ -205,6 +208,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
       hasConfigured,
       isReady,
       isConfigValid,
+      shouldShowWizard,
       setBaseUrl,
       setOAuthCredentials,
       clearBaseUrl,

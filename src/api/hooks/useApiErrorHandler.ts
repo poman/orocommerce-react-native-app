@@ -13,7 +13,7 @@ export interface ApiErrorState {
  * Hook to manage API error state and configuration wizard
  */
 export const useApiErrorHandler = () => {
-  const { isConfigValid, isReady } = useConfig();
+  const { isConfigValid, isReady, shouldShowWizard } = useConfig();
   const [errorState, setErrorState] = useState<ApiErrorState>({
     hasError: false,
     isUnauthorized: false,
@@ -22,9 +22,16 @@ export const useApiErrorHandler = () => {
     wizardReason: null,
   });
 
-  // Check if we need to show wizard on mount
   useEffect(() => {
-    if (isReady && !isConfigValid) {
+    if (isReady && shouldShowWizard) {
+      setErrorState({
+        hasError: true,
+        isUnauthorized: false,
+        showWizard: true,
+        showSignInPrompt: false,
+        wizardReason: 'missing_config',
+      });
+    } else if (isReady && !isConfigValid) {
       setErrorState({
         hasError: true,
         isUnauthorized: false,
@@ -33,7 +40,7 @@ export const useApiErrorHandler = () => {
         wizardReason: 'missing_config',
       });
     }
-  }, [isReady, isConfigValid]);
+  }, [isReady, isConfigValid, shouldShowWizard]);
 
   /**
    * Handle 401 Unauthorized error
