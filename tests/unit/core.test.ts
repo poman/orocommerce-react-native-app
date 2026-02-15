@@ -1,11 +1,3 @@
-/**
- * Simple Unit Tests for Core Functionality
- *
- * Tests that don't rely on complex React Native or Expo modules
- *
- * @group unit
- * @group critical
- */
 
 describe('Core Functionality - Unit Tests', () => {
   /**
@@ -325,4 +317,3 @@ describe('Core Functionality - Unit Tests', () => {
     });
   });
 });
-
