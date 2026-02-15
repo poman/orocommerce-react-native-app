@@ -5,18 +5,30 @@ This guide covers deploying the OroCommerce Mobile App using Expo Application Se
 ## Prerequisites
 
 1. **Create an Expo account** at https://expo.dev
+
 2. **Install EAS CLI globally:**
    ```bash
    npm install -g eas-cli
    ```
+
 3. **Login to your Expo account:**
    ```bash
    eas login
    ```
-4. **Configure your project** (if not already done):
+
+4. **Configure your project:**
+   
+   Run the configuration command to set up EAS Build for your project:
    ```bash
    eas build:configure
    ```
+   
+   This command will:
+   - Create an EAS project and generate a unique **Project ID**
+   - Automatically add the Project ID to your `app.json` under `extra.eas.projectId`
+   - Create `eas.json` if it doesn't exist
+   
+   **Important:** After running this command, your `app.json` will be updated with the Project ID. Make sure to copy this ID to `app.json.example` if you're sharing your code, or keep it in your local `app.json` only.
 
 ## Build Profiles
 
