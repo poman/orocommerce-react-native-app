@@ -189,7 +189,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value = useMemo(() => {
     const configValue = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_BASE_URL as string | undefined;
-    const isConfigPlaceholder = configValue && isPlaceholderUrl(configValue);
+    const isConfigPlaceholder = !!(configValue && isPlaceholderUrl(configValue));
 
     const isConfigValid = !!(
       baseUrl &&
@@ -199,7 +199,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
       oauthClientSecret
     );
 
-    const shouldShowWizard = isConfigPlaceholder && !hasConfigured;
+    const shouldShowWizard = Boolean(isConfigPlaceholder && !hasConfigured);
 
     return {
       baseUrl,
