@@ -2,6 +2,21 @@
 
 A React Native mobile application for OroCommerce B2B e-commerce platform, built with Expo.
 
+[![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Demo%20App-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.rkukla.orocommerceapp)
+[![Watch Demo](https://img.shields.io/badge/YouTube-Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=jvExANt-Q9E)
+
+## Screenshots
+
+<p style="text-align: center;">
+  <img src="docs/doc-screenshots/home.png" width="200" alt="Home Screen" />
+  <img src="docs/doc-screenshots/category.png" width="200" alt="Products Category" />
+  <img src="docs/doc-screenshots/shopping-list.png" width="200" alt="Shopping List" />
+  <img src="docs/doc-screenshots/shopping-list2.png" width="200" alt="Shopping List" />
+  <img src="docs/doc-screenshots/checkout1.png" width="200" alt="Checkout" />
+  <img src="docs/doc-screenshots/checkout2.png" width="200" alt="Checkout" />
+  <img src="docs/doc-screenshots/order.png" width="200" alt="Order" />
+</p>
+
 ## Table of Contents
 
 - [Quick Start](#quick-start)
