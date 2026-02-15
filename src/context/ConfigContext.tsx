@@ -13,10 +13,20 @@ const isPlaceholder = (value: string | undefined): boolean => {
 
 const getDefaultBaseUrl = (): string => {
   const envValue = process.env.EXPO_PUBLIC_API_BASE_URL;
-  if (envValue && !isPlaceholder(envValue)) return envValue;
+  if (envValue && !isPlaceholder(envValue)) {
+    if (isPlaceholderUrl(envValue)) {
+      return AppConfig.demo.url;
+    }
+    return envValue;
+  }
 
   const configValue = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_BASE_URL as string | undefined;
-  if (configValue && !isPlaceholder(configValue)) return configValue;
+  if (configValue && !isPlaceholder(configValue)) {
+    if (isPlaceholderUrl(configValue)) {
+      return AppConfig.demo.url;
+    }
+    return configValue;
+  }
 
   if (isDemoMode()) {
     return AppConfig.demo.url;
@@ -177,10 +187,13 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const value = useMemo(() => {
+    const configValue = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_BASE_URL as string | undefined;
+    const isUsingPlaceholderFallback = configValue && isPlaceholderUrl(configValue);
+
     const isConfigValid = !!(
       baseUrl &&
-      !isPlaceholderUrl(baseUrl) &&
       baseUrl !== 'http://localhost/' &&
+      (isUsingPlaceholderFallback || !isPlaceholderUrl(baseUrl)) &&
       oauthClientId &&
       oauthClientSecret
     );
