@@ -30,7 +30,7 @@ A React Native mobile application for OroCommerce B2B e-commerce platform(6.1LTS
 ### Prerequisites
 
 - Node.js 18+ and npm
-- OroCommerce instance (5.1 or higher)
+- OroCommerce instance (6.1 or higher)
 - Expo account (for deployment)
 
 ### Installation
