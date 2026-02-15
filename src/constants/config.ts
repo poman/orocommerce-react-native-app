@@ -118,3 +118,16 @@ export const isDemoUrl = (url: string): boolean => {
   const normalizedDemoUrl = AppConfig.demo.url.trim().toLowerCase().replace(/\/+$/, '');
   return normalizedUrl === normalizedDemoUrl;
 };
+
+/**
+ * Helper function to check if the URL is a placeholder that requires configuration
+ */
+export const isPlaceholderUrl = (url: string): boolean => {
+  if (!url) return false;
+  const normalizedUrl = url.trim().toLowerCase().replace(/\/+$/, '');
+  return (
+    normalizedUrl === 'https://your-orocommerce-instance.com' ||
+    normalizedUrl === 'http://localhost'
+  );
+};
+
