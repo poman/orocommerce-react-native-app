@@ -11,9 +11,6 @@ A React Native mobile application for OroCommerce B2B e-commerce platform, built
   <img src="docs/doc-screenshots/home.png" width="200" alt="Home Screen" />
   <img src="docs/doc-screenshots/category.png" width="200" alt="Products Category" />
   <img src="docs/doc-screenshots/shopping-list.png" width="200" alt="Shopping List" />
-  <img src="docs/doc-screenshots/shopping-list2.png" width="200" alt="Shopping List" />
-  <img src="docs/doc-screenshots/checkout1.png" width="200" alt="Checkout" />
-  <img src="docs/doc-screenshots/checkout2.png" width="200" alt="Checkout" />
   <img src="docs/doc-screenshots/order.png" width="200" alt="Order" />
 </p>
 
