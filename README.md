@@ -1,6 +1,6 @@
 # OroCommerce React Native Mobile App
 
-A React Native mobile application for OroCommerce B2B e-commerce platform, built with Expo.
+A React Native mobile application for OroCommerce B2B e-commerce platform(6.1LTS+), built with Expo.
 
 [![Get it on Google Play](https://img.shields.io/badge/Google%20Play-Demo%20App-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.rkukla.orocommerceapp)
 [![Watch Demo](https://img.shields.io/badge/YouTube-Watch%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=jvExANt-Q9E)
