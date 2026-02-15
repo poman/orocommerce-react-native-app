@@ -1,0 +1,39 @@
+{
+  "cli": {
+    "version": ">= 16.26.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "internal": {
+      "developmentClient": false,
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
+    "production": {
+      "developmentClient": false,
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
+    "production-apk": {
+      "developmentClient": false,
+      "distribution": "internal",
+      "android": { "buildType": "apk" }
+    }
+  },
+  "submit": {
+    "internal": {},
+    "production": {}
+  }
+}
