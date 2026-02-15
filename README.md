@@ -1,4 +1,4 @@
-# OroCommerce Mobile Storefront App
+# OroCommerce React Native Mobile App
 
 A React Native mobile application for OroCommerce B2B e-commerce platform, built with Expo.
 
