@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "OroCommerce B2B",
+    "slug": "oro-commerce-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "orocommerceapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.orocommerceapp"
+    },
+    "android": {
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/icon.png"
+      },
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#FFFFFF"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "package": "com.yourcompany.orocommerceapp"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF"
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      },
+      "EXPO_PUBLIC_API_BASE_URL": "https://your-orocommerce-instance.com/",
+      "EXPO_PUBLIC_OAUTH_CLIENT_ID": "YOUR_OAUTH_CLIENT_ID",
+      "EXPO_PUBLIC_OAUTH_CLIENT_SECRET": "YOUR_OAUTH_CLIENT_SECRET"
+    }
+  }
+}
+
