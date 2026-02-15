@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { getProductsBySkus, IProduct } from '../helpers/products';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
@@ -18,6 +18,8 @@ export function useWishlistProducts(skus: string[]): IUseWishlistProductsResult 
   const [refetchTrigger, setRefetchTrigger] = useState(0);
   const { baseUrl } = useConfig();
   const { getValidAccessToken, refreshAccessToken } = useAuth();
+
+  const skusKey = useMemo(() => JSON.stringify(skus), [skus]);
 
   useEffect(() => {
     let mounted = true;
@@ -45,7 +47,7 @@ export function useWishlistProducts(skus: string[]): IUseWishlistProductsResult 
         setRefreshTokenFn(refreshAccessToken);
 
         const result = await getProductsBySkus(validSkus, {
-          page: { number: 1, size: 50 }, // Get up to 50 wishlist items
+          page: { number: 1, size: 50 },
           sort: 'relevance',
           include: 'images,product.inventoryStatus',
         });
@@ -68,8 +70,7 @@ export function useWishlistProducts(skus: string[]): IUseWishlistProductsResult 
     return () => {
       mounted = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [skus.length, skus, refetchTrigger, baseUrl, getValidAccessToken]);
+  }, [skusKey, refetchTrigger, baseUrl, getValidAccessToken, refreshAccessToken, skus]);
 
   const refetch = () => {
     setRefetchTrigger(prev => prev + 1);

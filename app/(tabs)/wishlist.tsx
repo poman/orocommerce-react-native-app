@@ -30,8 +30,9 @@ export default function WishlistScreen() {
   const [refreshing, setRefreshing] = React.useState(false);
   const [layout, setLayout] = React.useState(getResponsiveLayout());
 
-  // Reverse the SKUs array so most recently added items appear first
-  const reversedSkus = [...wishlistSkus].reverse();
+  const reversedSkus = React.useMemo(() => {
+    return [...wishlistSkus].reverse();
+  }, [wishlistSkus]);
 
   const { loading, error, products: wishlistProducts, refetch } = useWishlistProducts(reversedSkus);
 
