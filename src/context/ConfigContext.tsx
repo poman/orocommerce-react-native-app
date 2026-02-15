@@ -189,17 +189,17 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value = useMemo(() => {
     const configValue = Constants.expoConfig?.extra?.EXPO_PUBLIC_API_BASE_URL as string | undefined;
-    const isUsingPlaceholderFallback = configValue && isPlaceholderUrl(configValue);
+    const isConfigPlaceholder = configValue && isPlaceholderUrl(configValue);
 
     const isConfigValid = !!(
       baseUrl &&
       baseUrl !== 'http://localhost/' &&
-      (isUsingPlaceholderFallback || !isPlaceholderUrl(baseUrl)) &&
+      (isConfigPlaceholder || !isPlaceholderUrl(baseUrl)) &&
       oauthClientId &&
       oauthClientSecret
     );
 
-    const shouldShowWizard = isUsingPlaceholderFallback || false;
+    const shouldShowWizard = isConfigPlaceholder && !hasConfigured;
 
     return {
       baseUrl,
