@@ -166,7 +166,9 @@ After the build completes, you'll receive a download link for:
 
 ### Update Version Number
 
-Edit `app.json`:
+Update the version in **both** `app.json` and `package.json` — they must stay in sync. If they differ, EAS CLI may read the wrong config and fail with errors like `extra.eas.projectId missing`.
+
+**`app.json`:**
 
 ```json
 {
@@ -182,10 +184,18 @@ Edit `app.json`:
 }
 ```
 
+**`package.json`:**
+
+```json
+{
+  "version": "1.0.1"
+}
+```
+
 **Important:**
-- `version` - User-visible version (e.g., "1.0.1")
-- `android.versionCode` - Must increment with each build
-- `ios.buildNumber` - Must increment with each build
+- `version` - User-visible version — must match in both `app.json` and `package.json`
+- `android.versionCode` - Must increment with each Android build
+- `ios.buildNumber` - Must increment with each iOS build
 
 ## Troubleshooting
 
