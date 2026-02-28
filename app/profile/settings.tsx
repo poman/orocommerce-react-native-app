@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
-import { ArrowLeft, X, Check, Settings as SettingsIcon } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
-import { isDemoMode, isDemoUrl, AppConfig, isProductionMode } from '@/src/constants/config';
+import { ArrowLeft, X, Check, Settings as SettingsIcon, Sliders } from '@/src/libs/Icon';
+import { useTheme } from '@/src/context/ThemeContext';
+import { isDemoMode, isDemoUrl, AppConfig, isProductionMode } from '@/src/themes/config';
 import { useConfig } from '@/src/context/ConfigContext';
 import { MainMenu } from '@/src/components/MainMenu';
 import { showToast } from '@/src/utils/toast';
 import { ConfigWizard } from '@/src/components/ConfigWizard';
+import { ThemePicker } from '@/src/components/ThemePicker';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function SettingsScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const {
     baseUrl,
@@ -272,6 +276,26 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Theme Appearance Section — demo mode only */}
+          {isDemoMode() && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Sliders size={20} color={ShopColors.primary} />
+                <Text style={styles.sectionTitle}>Theme Appearance</Text>
+              </View>
+
+              <Text style={styles.sectionDescription}>
+                Choose a visual theme for the app. In production, the theme is set in code via{' '}
+                <Text style={{ fontWeight: '600', fontFamily: 'monospace' }}>
+                  src/themes/index.ts
+                </Text>
+                .
+              </Text>
+
+              <ThemePicker />
+            </View>
+          )}
+
           {/* Current Configuration Info */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
@@ -326,7 +350,7 @@ export default function SettingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

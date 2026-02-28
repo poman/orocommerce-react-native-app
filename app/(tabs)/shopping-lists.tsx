@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,21 +13,23 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
-import { AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useShoppingLists } from '@/src/api/hooks/useShoppingLists';
 import { List, Plus, RefreshCw, X, ShoppingBag } from '@/src/libs/Icon';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { ShopHeader } from '@/src/components/ShopHeader';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function ShoppingListsScreen() {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { baseUrl } = useConfig();
   const { isAuthenticated, getValidAccessToken } = useAuth();
   const { loading, shoppingLists, refetch, createList } = useShoppingLists(
     {
-      page: { number: 1, size: AppConfig.shoppingList.defaultPageSize },
+      page: { number: 1, size: effectiveConfig.shoppingList.defaultPageSize },
       sort: 'id',
     },
     baseUrl,
@@ -291,7 +293,7 @@ export default function ShoppingListsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

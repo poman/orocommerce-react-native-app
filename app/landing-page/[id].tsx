@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLandingPage } from '@/src/api/hooks/useLandingPage';
 import { ArrowLeft, Search, RefreshCw } from '@/src/libs/Icon';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
 import { FooterNavigation } from '@/src/components/FooterNavigation';
+import { ThemeColors } from '@/src/themes/types';
 
 let WebView: any = null;
 if (Platform.OS !== 'web') {
@@ -25,6 +26,8 @@ if (Platform.OS !== 'web') {
 }
 
 export default function LandingPageScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const params = useLocalSearchParams();
   const landingPageId = params.id as string;
@@ -229,7 +232,7 @@ export default function LandingPageScreen() {
 </body>
 </html>
     `.trim();
-  }, [landingPage, baseUrl]);
+  }, [landingPage, baseUrl, ShopColors]);
 
   const [webViewHeight, setWebViewHeight] = React.useState(600);
 
@@ -506,7 +509,7 @@ export default function LandingPageScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, Mail, User } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { showToast } from '@/src/utils/toast';
 import api, { initializeApi, setAuthTokenGetter } from '@/src/api/api';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
+import { ThemeColors } from '@/src/themes/types';
 
 interface Message {
   id: string;
@@ -51,6 +52,8 @@ interface ConversationDetail {
 }
 
 export default function ConversationDetailScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { baseUrl } = useConfig();
@@ -288,7 +291,7 @@ export default function ConversationDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

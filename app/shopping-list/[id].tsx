@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -29,8 +29,7 @@ import {
   Trash2,
   X,
 } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
-import { AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { formatDiscount, formatPrice } from '@/src/utils/priceFormatter';
 import { useAuth } from '@/src/context/AuthContext';
@@ -49,6 +48,7 @@ import { showToast } from '@/src/utils/toast';
 import CustomAlert from '@/src/components/CustomAlert';
 import { TierPricesTable } from '@/src/components/TierPricesTable';
 import { MainMenu } from '@/src/components/MainMenu';
+import { ThemeColors } from '@/src/themes/types';
 
 interface ProductData {
   id: string;
@@ -134,6 +134,8 @@ interface UnitPrecisionData {
 }
 
 export default function ShoppingListDetailScreen() {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { baseUrl } = useConfig();
@@ -1031,7 +1033,7 @@ export default function ShoppingListDetailScreen() {
               <View style={styles.unitPriceWithInfo}>
                 <Text style={styles.itemUnitPrice}>
                   {unitPrice
-                    ? `$${parseFloat(unitPrice).toFixed(AppConfig.price.precision)} / ${getUnitLabel(selectedUnit)}`
+                    ? `$${parseFloat(unitPrice).toFixed(effectiveConfig.price.precision)} / ${getUnitLabel(selectedUnit)}`
                     : 'N/A'}
                 </Text>
                 {availableUnits.length >= 1 && (
@@ -1599,7 +1601,7 @@ export default function ShoppingListDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ShopColors.background,

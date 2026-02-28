@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,15 +11,18 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowLeft, MapPin, CreditCard, Truck, ShoppingCart } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { initializeApi, setAuthTokenGetter } from '@/src/api/api';
 import { getOrderById, IOrder } from '@/src/api/helpers/orders';
 import { formatPrice } from '@/src/utils/priceFormatter';
 import { MainMenu } from '@/src/components/MainMenu';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function OrderViewScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { baseUrl } = useConfig();
@@ -608,7 +611,7 @@ export default function OrderViewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ShopColors.background,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,10 @@ import {
   Dimensions,
 } from 'react-native';
 import { AlertCircle, CheckCircle, X } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
-import { isDemoMode, isDemoUrl, AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
+import { isDemoMode, isDemoUrl, AppConfig } from '@/src/themes/config';
 import { useConfig } from '@/src/context/ConfigContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface ConfigWizardProps {
   visible: boolean;
@@ -29,6 +30,8 @@ export const ConfigWizard: React.FC<ConfigWizardProps> = ({
   canDismiss = false,
   reason = 'missing_config',
 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { baseUrl, oauthClientId, oauthClientSecret, setBaseUrl, setOAuthCredentials } =
     useConfig();
 
@@ -260,7 +263,7 @@ export const ConfigWizard: React.FC<ConfigWizardProps> = ({
 
 const { height: screenHeight } = Dimensions.get('window');
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',

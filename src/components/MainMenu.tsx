@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface MainMenuProps {
   activeTab?: string;
 }
 
 export const MainMenu: React.FC<MainMenuProps> = ({ activeTab }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
@@ -64,7 +67,7 @@ export const MainMenu: React.FC<MainMenuProps> = ({ activeTab }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   wrapper: {
     backgroundColor: '#FFFFFF',
     borderTopColor: ShopColors.border,

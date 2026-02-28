@@ -14,10 +14,10 @@ import {
 } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { Heart, Info } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
-import { AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
 import { TierPricesTable } from '@/src/components/TierPricesTable';
 import api from '@/src/api/api';
+import { ThemeColors } from '@/src/themes/types';
 
 interface UnitOption {
   code: string;
@@ -43,6 +43,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   showAddToCart = true,
   width,
 }) => {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const pathname = usePathname();
   const [showInventoryStatus, setShowInventoryStatus] = useState(false);
@@ -573,8 +575,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               {!priceAvailable
                 ? `N/A / ${priceUnit}`
                 : priceRange
-                  ? `${currencySymbol}${priceRange.min.toFixed(AppConfig.price.precision)} - ${currencySymbol}${priceRange.max.toFixed(AppConfig.price.precision)} / ${priceUnit}`
-                  : `${currencySymbol}${productPrice.toFixed(AppConfig.price.precision)} / ${priceUnit}`}
+                  ? `${currencySymbol}${priceRange.min.toFixed(effectiveConfig.price.precision)} - ${currencySymbol}${priceRange.max.toFixed(effectiveConfig.price.precision)} / ${priceUnit}`
+                  : `${currencySymbol}${productPrice.toFixed(effectiveConfig.price.precision)} / ${priceUnit}`}
             </Text>
             <TouchableOpacity style={styles.priceInfoButton} onPress={handleTierPricesClick}>
               <Info size={16} color={ShopColors.primary} />
@@ -667,7 +669,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   cardWrapper: {
     position: 'relative',
   },

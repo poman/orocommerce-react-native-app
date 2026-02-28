@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,18 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
-import { AppConfig, isDemoMode } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
+import { AppConfig, isDemoMode } from '@/src/themes/config';
 import { useAuth } from '@/src/context/AuthContext';
 import { showToast } from '@/src/utils/toast';
 import { ArrowLeft, Search } from '@/src/libs/Icon';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
 import { FooterNavigation } from '@/src/components/FooterNavigation';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function LoginScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { redirect } = useLocalSearchParams<{ redirect?: string }>();
   const { login } = useAuth();
@@ -252,7 +255,7 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

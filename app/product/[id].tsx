@@ -31,15 +31,17 @@ import { TopMainMenu } from '@/src/components/TopMainMenu';
 import { showToast } from '@/src/utils/toast';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
-import { ShopColors } from '@/src/constants/theme';
-import { AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
 import { IProduct } from '@/src/api/helpers/products';
 import api, { initializeApi, setAuthTokenGetter } from '@/src/api/api';
 import { PRODUCTS_ENDPOINT } from '@/src/api/endpoints';
 import { IJsonApiResponse } from '@/src/api/types';
 import { addRecentlyViewed } from '@/src/api/hooks/useRecentlyViewed';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function ProductDetailScreen() {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { id, redirect } = useLocalSearchParams<{ id: string; redirect?: string }>();
   const router = useRouter();
   const navigation = useNavigation();
@@ -679,7 +681,7 @@ export default function ProductDetailScreen() {
             <View style={styles.priceSection}>
               <Text style={styles.price}>
                 {priceAvailable
-                  ? `${currencySymbol}${productPrice.toFixed(AppConfig.price.precision)} / ${priceUnit}`
+                  ? `${currencySymbol}${productPrice.toFixed(effectiveConfig.price.precision)} / ${priceUnit}`
                   : `N/A / ${priceUnit}`}
               </Text>
             </View>
@@ -891,7 +893,7 @@ export default function ProductDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

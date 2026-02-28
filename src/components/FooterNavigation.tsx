@@ -4,18 +4,21 @@
  * Used in auth pages and standalone screens
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface FooterNavigationProps {
   activeTab?: 'home' | 'orders' | 'lists' | 'wishlist' | 'profile';
 }
 
 export const FooterNavigation: React.FC<FooterNavigationProps> = ({ activeTab = 'profile' }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -51,7 +54,7 @@ export const FooterNavigation: React.FC<FooterNavigationProps> = ({ activeTab = 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   wrapper: {
     backgroundColor: '#FFFFFF',
     borderTopColor: ShopColors.border,

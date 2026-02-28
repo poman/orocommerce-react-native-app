@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Search } from '@/src/libs/Icon';
-import { ShopColors, ShopConfig } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface ShopHeaderProps {
   showSearch?: boolean;
@@ -20,6 +21,8 @@ export const ShopHeader: React.FC<ShopHeaderProps> = ({
   activeTab = 'home',
   onTabChange,
 }) => {
+  const { colors: ShopColors, shopConfig: ShopConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
 
   const handleSearchPress = () => {
@@ -46,17 +49,24 @@ export const ShopHeader: React.FC<ShopHeaderProps> = ({
             accessibilityLabel="Go to home"
             accessibilityRole="button"
           >
-            <Image
-              source={ShopConfig.logo}
-              style={[
-                styles.logo,
-                {
-                  width: ShopConfig.logoWidth,
-                  height: ShopConfig.logoHeight,
-                },
-              ]}
-              contentFit="contain"
-            />
+            {ShopConfig.LogoComponent ? (
+              <ShopConfig.LogoComponent
+                width={ShopConfig.logoWidth}
+                height={ShopConfig.logoHeight}
+              />
+            ) : ShopConfig.logo ? (
+              <Image
+                source={ShopConfig.logo}
+                style={[
+                  styles.logo,
+                  {
+                    width: ShopConfig.logoWidth,
+                    height: ShopConfig.logoHeight,
+                  },
+                ]}
+                contentFit="contain"
+              />
+            ) : null}
           </TouchableOpacity>
 
           {/* Right side - Search Icon */}
@@ -68,7 +78,7 @@ export const ShopHeader: React.FC<ShopHeaderProps> = ({
                 accessibilityLabel="Search"
                 accessibilityRole="button"
               >
-                <Search size={24} color={ShopColors.text} />
+                <Search size={24} color={ShopColors.primary} />
               </TouchableOpacity>
             </View>
           )}
@@ -102,7 +112,7 @@ export const ShopHeader: React.FC<ShopHeaderProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   headerWrapper: {
     backgroundColor: ShopColors.background,
   },

@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { ShopHeader } from '@/src/components/ShopHeader';
@@ -35,6 +35,7 @@ import {
 } from '@/src/libs/Icon';
 import { useOrders } from '@/src/api/hooks/useOrders';
 import { IOrder } from '@/src/api/helpers/orders';
+import { ThemeColors } from '@/src/themes/types';
 
 const getOrderStatusText = (order: IOrder): string => {
   const statusRelationship = (order as any).relationships?.status?.data;
@@ -57,34 +58,34 @@ const getOrderStatusText = (order: IOrder): string => {
   return 'Open';
 };
 
-const getStatusColorByText = (statusText: string) => {
+const getStatusColorByText = (statusText: string, colors: ThemeColors) => {
   const statusLower = statusText.toLowerCase();
   if (statusLower.includes('open') || statusLower.includes('pending')) {
-    return ShopColors.primary;
+    return colors.primary;
   } else if (statusLower.includes('processing') || statusLower.includes('in_progress')) {
     return '#2196F3';
   } else if (statusLower.includes('shipped') || statusLower.includes('sent')) {
-    return ShopColors.primary;
+    return colors.primary;
   } else if (
     statusLower.includes('closed') ||
     statusLower.includes('delivered') ||
     statusLower.includes('complete')
   ) {
-    return ShopColors.success;
+    return colors.success;
   } else if (statusLower.includes('cancelled') || statusLower.includes('canceled')) {
-    return ShopColors.error;
+    return colors.error;
   }
-  return ShopColors.textSecondary;
+  return colors.textSecondary;
 };
 
-const getPaymentStatusColor = (paymentStatus: string) => {
+const getPaymentStatusColor = (paymentStatus: string, colors: ThemeColors) => {
   const statusLower = paymentStatus.toLowerCase();
   if (
     statusLower.includes('paid') ||
     statusLower.includes('completed') ||
     statusLower.includes('authorized')
   ) {
-    return ShopColors.success;
+    return colors.success;
   } else if (statusLower.includes('pending') || statusLower.includes('processing')) {
     return '#FF9800';
   } else if (
@@ -92,7 +93,7 @@ const getPaymentStatusColor = (paymentStatus: string) => {
     statusLower.includes('declined') ||
     statusLower.includes('cancelled')
   ) {
-    return ShopColors.error;
+    return colors.error;
   } else if (statusLower.includes('refund')) {
     return '#9C27B0';
   }
@@ -118,6 +119,8 @@ const getTimeFilterLabel = (value: string): string => {
 };
 
 const SkeletonImage = () => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -153,6 +156,8 @@ const SkeletonImage = () => {
 };
 
 export default function OrdersScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { isAuthenticated, getValidAccessToken } = useAuth();
   const { baseUrl } = useConfig();
@@ -750,10 +755,10 @@ export default function OrdersScreen() {
             <View
               style={[
                 styles.statusBadge,
-                { backgroundColor: getStatusColorByText(orderStatus) + '20' },
+                { backgroundColor: getStatusColorByText(orderStatus, ShopColors) + '20' },
               ]}
             >
-              <Text style={[styles.statusText, { color: getStatusColorByText(orderStatus) }]}>
+              <Text style={[styles.statusText, { color: getStatusColorByText(orderStatus, ShopColors) }]}>
                 {orderStatus}
               </Text>
             </View>
@@ -842,7 +847,7 @@ export default function OrdersScreen() {
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Payment:</Text>
                   <Text
-                    style={[styles.detailValue, { color: getPaymentStatusColor(paymentStatus) }]}
+                    style={[styles.detailValue, { color: getPaymentStatusColor(paymentStatus, ShopColors) }]}
                   >
                     {paymentStatus}
                   </Text>
@@ -1466,7 +1471,7 @@ export default function OrdersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

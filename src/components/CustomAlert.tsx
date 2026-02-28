@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Modal,
   View,
@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface CustomAlertProps {
   visible: boolean;
@@ -30,6 +31,8 @@ export default function CustomAlert({
   cancelText = 'Cancel',
   type = 'info',
 }: CustomAlertProps) {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const getAccentColor = () => {
     switch (type) {
       case 'success':
@@ -99,7 +102,7 @@ export default function CustomAlert({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',

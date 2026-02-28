@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { ProductCard } from '@/src/components/ProductCard';
 import { IProduct } from '@/src/api/helpers/products';
 import { ChevronRight } from '@/src/libs/Icon';
+import { ThemeColors } from '@/src/themes/types';
 
 interface NewArrivalSectionProps {
   products: IProduct[];
@@ -23,6 +24,8 @@ export const NewArrivalSection: React.FC<NewArrivalSectionProps> = ({
   cardWidth,
   isLoading = false,
 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
 
   if (!isLoading && products.length === 0) {
@@ -72,7 +75,7 @@ export const NewArrivalSection: React.FC<NewArrivalSectionProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     marginBottom: 24,
     paddingHorizontal: 16,

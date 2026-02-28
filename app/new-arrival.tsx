@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { ProductCard } from '@/src/components/ProductCard';
 import { useShop } from '@/src/context/ShopContext';
 import { useConfig } from '@/src/context/ConfigContext';
@@ -20,9 +20,11 @@ import { getResponsiveLayout } from '@/src/utils/responsive';
 import { ArrowLeft, Search, RefreshCw } from '@/src/libs/Icon';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
 import { FooterNavigation } from '@/src/components/FooterNavigation';
-import { AppConfig } from '@/src/constants/config';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function NewArrivalScreen() {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { toggleWishlist, isInWishlist } = useShop();
   const { baseUrl } = useConfig();
@@ -39,7 +41,7 @@ export default function NewArrivalScreen() {
 
   const { loading, error, products, refetch } = useProducts(
     {
-      page: { number: 1, size: AppConfig.newArrival.listingNewArrival },
+      page: { number: 1, size: effectiveConfig.newArrival.listingNewArrival },
       sort: '-updatedAt',
       filter: { newArrival: 'true' },
       include: 'images,inventoryStatus',
@@ -155,7 +157,7 @@ export default function NewArrivalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

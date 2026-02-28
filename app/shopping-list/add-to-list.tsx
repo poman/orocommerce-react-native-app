@@ -15,8 +15,7 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { ArrowLeft, Search, Plus, Check, Edit2 } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
-import { AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import api, { initializeApi, setAuthTokenGetter } from '@/src/api/api';
@@ -24,6 +23,7 @@ import { useShoppingLists } from '@/src/api/hooks/useShoppingLists';
 import { TierPricesTable } from '@/src/components/TierPricesTable';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
 import { showToast } from '@/src/utils/toast';
+import { ThemeColors } from '@/src/themes/types';
 
 interface UnitOption {
   code: string;
@@ -33,6 +33,8 @@ interface UnitOption {
 }
 
 export default function AddToShoppingListScreen() {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const params = useLocalSearchParams();
   const { baseUrl } = useConfig();
@@ -72,7 +74,7 @@ export default function AddToShoppingListScreen() {
     refetch,
   } = useShoppingLists(
     {
-      page: { number: 1, size: AppConfig.shoppingList.defaultPageSize },
+      page: { number: 1, size: effectiveConfig.shoppingList.defaultPageSize },
     },
     baseUrl,
     getValidAccessToken
@@ -766,7 +768,7 @@ export default function AddToShoppingListScreen() {
                     </Text>
                     <Text style={styles.listItemTotal}>
                       Total: {currencySymbol}
-                      {parseFloat(list.attributes.total).toFixed(AppConfig.price.precision)}
+                      {parseFloat(list.attributes.total).toFixed(effectiveConfig.price.precision)}
                     </Text>
                   </View>
                   {selectedListId === list.id && <Check size={24} color={ShopColors.primary} />}
@@ -796,14 +798,14 @@ export default function AddToShoppingListScreen() {
                 <Text style={styles.footerLabel}>Price:</Text>
                 <Text style={styles.footerValue}>
                   {currencySymbol}
-                  {productPrice.toFixed(AppConfig.price.precision)}
+                  {productPrice.toFixed(effectiveConfig.price.precision)}
                 </Text>
               </View>
               <View style={styles.footerRow}>
                 <Text style={styles.footerLabel}>Total:</Text>
                 <Text style={[styles.footerValue, styles.footerTotal]}>
                   {currencySymbol}
-                  {(productPrice * quantity).toFixed(AppConfig.price.precision)}
+                  {(productPrice * quantity).toFixed(effectiveConfig.price.precision)}
                 </Text>
               </View>
             </View>
@@ -831,7 +833,7 @@ export default function AddToShoppingListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ShopColors.background,

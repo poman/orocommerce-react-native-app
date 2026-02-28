@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,14 +13,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { X, Search as SearchIcon, ArrowLeft } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useProductSearch } from '@/src/api/hooks/useProductSearch';
 import { ProductCard } from '@/src/components/ProductCard';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
 import { getResponsiveLayout } from '@/src/utils/responsive';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function SearchScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { baseUrl } = useConfig();
   const [searchQuery, setSearchQuery] = useState('');
@@ -149,7 +152,7 @@ export default function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

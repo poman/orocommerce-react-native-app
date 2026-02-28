@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { ArrowLeft, Plus, Edit2, Trash2, MapPin } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { MainMenu } from '@/src/components/MainMenu';
@@ -18,8 +18,11 @@ import { getCustomerAddresses, ICustomerAddress } from '@/src/api/helpers/checko
 import api, { initializeApi, setAuthTokenGetter } from '@/src/api/api';
 import { showToast } from '@/src/utils/toast';
 import CustomAlert from '@/src/components/CustomAlert';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function MyAddressesScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { baseUrl } = useConfig();
   const { getValidAccessToken } = useAuth();
@@ -249,7 +252,7 @@ export default function MyAddressesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

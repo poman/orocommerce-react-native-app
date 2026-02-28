@@ -4,14 +4,14 @@
  * Only shows when there are 2+ items
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { ProductCard } from '@/src/components/ProductCard';
 import { IProduct } from '@/src/api/helpers/products';
 import { ChevronRight } from '@/src/libs/Icon';
-import { AppConfig } from '@/src/constants/config';
+import { ThemeColors } from '@/src/themes/types';
 
 interface RecentlyViewedSectionProps {
   products: IProduct[];
@@ -30,6 +30,8 @@ export const RecentlyViewedSection: React.FC<RecentlyViewedSectionProps> = ({
   cardWidth,
   isLoading = false,
 }) => {
+  const { colors: ShopColors, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
 
   // Don't show if less than 1 items
@@ -37,7 +39,7 @@ export const RecentlyViewedSection: React.FC<RecentlyViewedSectionProps> = ({
     return null;
   }
 
-  const displayedProducts = products.slice(0, AppConfig.recentlyViewed.maxProducts);
+  const displayedProducts = products.slice(0, effectiveConfig.recentlyViewed.maxProducts);
 
   const handleViewMore = () => {
     router.push('/recently-viewed' as any);
@@ -81,7 +83,7 @@ export const RecentlyViewedSection: React.FC<RecentlyViewedSectionProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     marginBottom: 24,
     paddingHorizontal: 16,

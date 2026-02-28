@@ -3,10 +3,11 @@
  * Supports multiple banner types: feature, image, and promo-bar
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
-import { HomepageSectionBanner, ShopColors } from '@/src/constants/theme';
+import { HomepageSectionBanner, ThemeColors } from '@/src/themes/types';
+import { useTheme } from '@/src/context/ThemeContext';
 import * as Icon from '@/src/libs/Icon';
 
 interface SectionBannerProps {
@@ -24,6 +25,8 @@ const getIconComponent = (iconName: string) => {
 };
 
 export const SectionBanner: React.FC<SectionBannerProps> = ({ banner, width }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { width: screenWidth } = useWindowDimensions();
   const isSmallScreen = screenWidth < 460;
@@ -164,7 +167,7 @@ export const SectionBanner: React.FC<SectionBannerProps> = ({ banner, width }) =
   return null;
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     width: '100%',
     marginBottom: 24,

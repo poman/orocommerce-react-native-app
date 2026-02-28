@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppConfig } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
 
 const RECENTLY_VIEWED_KEY = 'app.recentlyViewed';
 
@@ -26,7 +26,7 @@ const getRecentlyViewedFromStorage = async (): Promise<string[]> => {
   }
 };
 
-const addToRecentlyViewedStorage = async (productId: string, productSku: string): Promise<void> => {
+const addToRecentlyViewedStorage = async (productId: string, productSku: string, maxItems: number): Promise<void> => {
   try {
     const data = await AsyncStorage.getItem(RECENTLY_VIEWED_KEY);
     let items: RecentlyViewedItem[] = data ? JSON.parse(data) : [];
@@ -39,7 +39,6 @@ const addToRecentlyViewedStorage = async (productId: string, productSku: string)
       viewedAt: Date.now(),
     });
 
-    const maxItems = AppConfig.recentlyViewed.listingRecentlyViewed;
     if (items.length > maxItems) {
       items = items.slice(0, maxItems);
     }
@@ -61,12 +60,16 @@ const clearAllRecentlyViewedStorage = async (): Promise<void> => {
 /**
  * Standalone function to add a product to recently viewed
  * Use this in components that don't need the full hook
+ * @param productId
+ * @param productSku
+ * @param maxItems - max items to keep in storage (defaults to 25)
  */
-export const addRecentlyViewed = async (productId: string, productSku: string): Promise<void> => {
-  await addToRecentlyViewedStorage(productId, productSku);
+export const addRecentlyViewed = async (productId: string, productSku: string, maxItems = 25): Promise<void> => {
+  await addToRecentlyViewedStorage(productId, productSku, maxItems);
 };
 
 export const useRecentlyViewed = () => {
+  const { effectiveConfig } = useTheme();
   const [recentlyViewedIds, setRecentlyViewedIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -88,10 +91,10 @@ export const useRecentlyViewed = () => {
 
   const addToRecentlyViewed = useCallback(
     async (productId: string, productSku: string) => {
-      await addToRecentlyViewedStorage(productId, productSku);
+      await addToRecentlyViewedStorage(productId, productSku, effectiveConfig.recentlyViewed.listingRecentlyViewed);
       await loadRecentlyViewed();
     },
-    [loadRecentlyViewed]
+    [loadRecentlyViewed, effectiveConfig.recentlyViewed.listingRecentlyViewed]
   );
 
   const clearRecentlyViewed = useCallback(async () => {

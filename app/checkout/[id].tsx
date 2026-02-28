@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ import {
   Info,
   X,
 } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { initializeApi, setAuthTokenGetter } from '@/src/api/api';
@@ -52,6 +52,7 @@ import {
 import { formatPrice } from '@/src/utils/priceFormatter';
 import { showToast } from '@/src/utils/toast';
 import { TopMainMenu } from '@/src/components/TopMainMenu';
+import { ThemeColors } from '@/src/themes/types';
 
 // Storage key for checkout state persistence
 const CHECKOUT_STATE_KEY = 'checkout_state_';
@@ -105,6 +106,8 @@ const clearCheckoutState = async (shoppingListId: string) => {
 };
 
 export default function CheckoutScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { id, name } = useLocalSearchParams<{ id: string; name?: string }>();
   const router = useRouter();
   const { baseUrl } = useConfig();
@@ -2318,7 +2321,7 @@ export default function CheckoutScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ShopColors.background,

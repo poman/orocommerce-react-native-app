@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { Heart, RefreshCw, Package } from '@/src/libs/Icon';
 import { useShop } from '@/src/context/ShopContext';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useWishlistProducts } from '@/src/api/hooks/useWishlistProducts';
 import { useConfig } from '@/src/context/ConfigContext';
 import { useAuth } from '@/src/context/AuthContext';
@@ -21,8 +21,11 @@ import { ShopHeader } from '@/src/components/ShopHeader';
 import { ProductCardSkeleton } from '@/src/components/ProductCardSkeleton';
 import { ProductCard } from '@/src/components/ProductCard';
 import { getResponsiveLayout } from '@/src/utils/responsive';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function WishlistScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { wishlistSkus, toggleWishlist } = useShop();
   const { baseUrl } = useConfig();
@@ -207,7 +210,7 @@ export default function WishlistScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

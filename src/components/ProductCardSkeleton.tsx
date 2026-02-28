@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Skeleton } from './Skeleton';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface ProductCardSkeletonProps {
   width?: number;
 }
 
 export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({ width = 180 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   return (
     <View style={[styles.productCard, { width }]}>
       <Skeleton width="100%" height={180} borderRadius={0} />
@@ -25,7 +28,7 @@ export const ProductCardSkeleton: React.FC<ProductCardSkeletonProps> = ({ width 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   productCard: {
     backgroundColor: ShopColors.cardBackground,
     borderRadius: 8,

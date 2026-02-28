@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { RefreshCw, Package } from '@/src/libs/Icon';
 import { HtmlRenderer } from '@/src/components/HtmlRenderer';
 import { useShop } from '@/src/context/ShopContext';
 import { useConfig } from '@/src/context/ConfigContext';
-import { ShopColors, HomepageBanners, HomepageSectionBanners } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useProducts } from '@/src/api/hooks/useProducts';
 import { useCategories } from '@/src/api/hooks/useCategories';
 import { ProductCardSkeleton } from '@/src/components/ProductCardSkeleton';
@@ -31,11 +31,13 @@ import { FeaturedProductsSection } from '@/src/components/FeaturedProductsSectio
 import { NewArrivalSection } from '@/src/components/NewArrivalSection';
 import { SectionBanner } from '@/src/components/SectionBanner';
 import { getProductsByIds, IProduct } from '@/src/api/helpers/products';
-import { AppConfig } from '@/src/constants/config';
 import { ConfigWizard } from '@/src/components/ConfigWizard';
 import { useApiErrorHandler } from '@/src/api/hooks/useApiErrorHandler';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function HomeScreen() {
+  const { colors: ShopColors, homepageBanners: HomepageBanners, homepageSectionBanners: HomepageSectionBanners, effectiveConfig } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { toggleWishlist, isInWishlist } = useShop();
   const { baseUrl } = useConfig();
@@ -70,12 +72,12 @@ export default function HomeScreen() {
 
   const featuredProductsParams = React.useMemo(
     () => ({
-      page: { number: 1, size: AppConfig.featuredProducts.maxProducts },
+      page: { number: 1, size: effectiveConfig.featuredProducts.maxProducts },
       sort: '-updatedAt',
       filter: { featured: 'true' },
       include: 'images,inventoryStatus',
     }),
-    []
+    [effectiveConfig.featuredProducts.maxProducts]
   );
 
   const {
@@ -92,12 +94,12 @@ export default function HomeScreen() {
 
   const newArrivalProductsParams = React.useMemo(
     () => ({
-      page: { number: 1, size: AppConfig.newArrival.maxProducts },
+      page: { number: 1, size: effectiveConfig.newArrival.maxProducts },
       sort: '-updatedAt',
       filter: { newArrival: 'true' },
       include: 'images,inventoryStatus',
     }),
-    []
+    [effectiveConfig.newArrival.maxProducts]
   );
 
   const {
@@ -585,7 +587,7 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

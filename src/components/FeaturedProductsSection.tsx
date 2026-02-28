@@ -4,13 +4,14 @@
  * Shows recently updated featured products
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { ProductCard } from '@/src/components/ProductCard';
 import { IProduct } from '@/src/api/helpers/products';
 import { ChevronRight } from '@/src/libs/Icon';
+import { ThemeColors } from '@/src/themes/types';
 
 interface FeaturedProductsSectionProps {
   products: IProduct[];
@@ -29,6 +30,8 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
   cardWidth,
   isLoading = false,
 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
 
   if (!isLoading && products.length === 0) {
@@ -78,7 +81,7 @@ export const FeaturedProductsSection: React.FC<FeaturedProductsSectionProps> = (
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     marginBottom: 24,
     paddingHorizontal: 16,

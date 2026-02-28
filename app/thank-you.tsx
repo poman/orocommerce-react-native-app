@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ShoppingBag, FileText, CheckCircle } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 import { ShopHeader } from '@/src/components/ShopHeader';
 import { FooterNavigation } from '@/src/components/FooterNavigation';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function ThankYouScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const { orderId, orderNumber } = useLocalSearchParams<{
     orderId?: string;
     orderNumber?: string;
@@ -96,7 +99,7 @@ export default function ThankYouScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ShopColors.background,

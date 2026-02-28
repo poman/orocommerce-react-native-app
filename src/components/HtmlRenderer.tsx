@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TextStyle } from 'react-native';
-import { HtmlStyles } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeHtmlStyles } from '@/src/themes/types';
 
 interface HtmlRendererProps {
   html: string;
@@ -119,7 +120,7 @@ function parseHtml(html: string): Array<{ type: string; content: string; childre
   return elements;
 }
 
-function renderElement(element: any, index: number): React.ReactNode {
+function renderElement(element: any, index: number, styles: ReturnType<typeof createStyles>): React.ReactNode {
   if (element.type === 'text') {
     return element.content;
   }
@@ -134,35 +135,35 @@ function renderElement(element: any, index: number): React.ReactNode {
     case 'p':
       return (
         <Text key={index} style={styles.paragraph}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
     case 'div':
       return (
         <Text key={index} style={styles.div}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
     case 'h1':
       return (
         <Text key={index} style={styles.h1}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
     case 'h2':
       return (
         <Text key={index} style={styles.h2}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
     case 'h3':
       return (
         <Text key={index} style={styles.h3}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
@@ -171,7 +172,7 @@ function renderElement(element: any, index: number): React.ReactNode {
     case 'h6':
       return (
         <Text key={index} style={styles.h4}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
@@ -179,7 +180,7 @@ function renderElement(element: any, index: number): React.ReactNode {
     case 'ol':
       return (
         <View key={index} style={styles.list}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </View>
       );
 
@@ -188,7 +189,7 @@ function renderElement(element: any, index: number): React.ReactNode {
         <View key={index} style={styles.listItem}>
           <Text style={styles.bullet}>• </Text>
           <Text style={styles.listItemText}>
-            {children.map((child: any, i: number) => renderElement(child, i))}
+            {children.map((child: any, i: number) => renderElement(child, i, styles))}
           </Text>
         </View>
       );
@@ -197,7 +198,7 @@ function renderElement(element: any, index: number): React.ReactNode {
     case 'b':
       return (
         <Text key={index} style={styles.bold}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
@@ -205,7 +206,7 @@ function renderElement(element: any, index: number): React.ReactNode {
     case 'i':
       return (
         <Text key={index} style={styles.italic}>
-          {children.map((child: any, i: number) => renderElement(child, i))}
+          {children.map((child: any, i: number) => renderElement(child, i, styles))}
         </Text>
       );
 
@@ -214,7 +215,7 @@ function renderElement(element: any, index: number): React.ReactNode {
       if (children.length > 0) {
         return (
           <Text key={index} style={styles.text}>
-            {children.map((child: any, i: number) => renderElement(child, i))}
+            {children.map((child: any, i: number) => renderElement(child, i, styles))}
           </Text>
         );
       }
@@ -223,6 +224,9 @@ function renderElement(element: any, index: number): React.ReactNode {
 }
 
 export const HtmlRenderer: React.FC<HtmlRendererProps> = ({ html, baseStyle }) => {
+  const { htmlStyles: HtmlStyles } = useTheme();
+  const styles = useMemo(() => createStyles(HtmlStyles), [HtmlStyles]);
+
   if (!html) {
     return <Text style={[styles.text, baseStyle]}>No description available</Text>;
   }
@@ -232,7 +236,7 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({ html, baseStyle }) =
   return (
     <View style={styles.container}>
       {elements.map((element, index) => {
-        const rendered = renderElement(element, index);
+        const rendered = renderElement(element, index, styles);
         if (typeof rendered === 'string') {
           return (
             <Text key={index} style={styles.text}>
@@ -246,27 +250,28 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({ html, baseStyle }) =
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  text: HtmlStyles.text,
-  paragraph: HtmlStyles.paragraph,
-  div: HtmlStyles.div,
-  h1: HtmlStyles.h1,
-  h2: HtmlStyles.h2,
-  h3: HtmlStyles.h3,
-  h4: HtmlStyles.h4,
-  list: HtmlStyles.list,
-  listItem: {
-    flexDirection: 'row',
-    ...HtmlStyles.listItem,
-  },
-  bullet: HtmlStyles.bullet,
-  listItemText: {
-    flex: 1,
-    ...HtmlStyles.listItemText,
-  },
-  bold: HtmlStyles.bold,
-  italic: HtmlStyles.italic,
-});
+const createStyles = (HtmlStyles: ThemeHtmlStyles) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    text: HtmlStyles.text,
+    paragraph: HtmlStyles.paragraph,
+    div: HtmlStyles.div,
+    h1: HtmlStyles.h1,
+    h2: HtmlStyles.h2,
+    h3: HtmlStyles.h3,
+    h4: HtmlStyles.h4,
+    list: HtmlStyles.list,
+    listItem: {
+      flexDirection: 'row',
+      ...HtmlStyles.listItem,
+    },
+    bullet: HtmlStyles.bullet,
+    listItemText: {
+      flex: 1,
+      ...HtmlStyles.listItemText,
+    },
+    bold: HtmlStyles.bold,
+    italic: HtmlStyles.italic,
+  });

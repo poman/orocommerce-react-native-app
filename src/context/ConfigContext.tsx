@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
-import { isDemoMode, AppConfig, isPlaceholderUrl } from '@/src/constants/config';
+import { isDemoMode, AppConfig, isPlaceholderUrl } from '@/src/themes/config';
 
 const STORAGE_KEY_BASE_URL = 'app.baseUrl';
 const STORAGE_KEY_CLIENT_ID = 'app.oauthClientId';

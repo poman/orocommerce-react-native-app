@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 import {
   groupAndSortTierPrices,
   formatQuantity,
@@ -29,6 +30,8 @@ export const TierPricesTable: React.FC<TierPricesTableProps> = ({
   compact = false,
   noBorder = false,
 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const groupedPrices = groupAndSortTierPrices(prices, defaultUnit);
 
   if (groupedPrices.length === 0) {
@@ -91,7 +94,7 @@ export const TierPricesTable: React.FC<TierPricesTableProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   // Full table styles
   container: {
     backgroundColor: ShopColors.cardBackground,

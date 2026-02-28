@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Animated } from 'react-native';
 import { ToastConfig } from 'react-native-toast-message';
-import { ToastColors } from '@/src/constants/theme';
+import { ThemeToastColors } from '@/src/themes/types';
 
 interface CustomToastProps {
   text1?: string;
@@ -18,8 +18,9 @@ const CustomToastBase = ({
   text2,
   hide,
   type,
-}: CustomToastProps & { type: 'success' | 'error' | 'warning' | 'info' }) => {
-  const colors = ToastColors[type];
+  themeToastColors,
+}: CustomToastProps & { type: 'success' | 'error' | 'warning' | 'info'; themeToastColors: ThemeToastColors }) => {
+  const colors = themeToastColors[type];
   const slideAnim = useRef(new Animated.Value(400)).current;
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const CustomToastBase = ({
 
   return (
     <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.container, { backgroundColor: colors.background, borderColor: themeToastColors.common.borderColor }]}>
         {/* Left accent bar */}
         <View style={[styles.accentBar, { backgroundColor: colors.accent }]} />
 
@@ -71,22 +72,26 @@ const CustomToastBase = ({
         {/* Close button */}
         <TouchableOpacity
           onPress={handleHide}
-          style={styles.closeButton}
+          style={[styles.closeButton, { backgroundColor: themeToastColors.common.closeButtonBackground }]}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.closeIcon}>✕</Text>
+          <Text style={[styles.closeIcon, { color: themeToastColors.common.closeIconColor }]}>✕</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>
   );
 };
 
-export const toastConfig: ToastConfig = {
-  success: props => <CustomToastBase {...props} type="success" />,
-  error: props => <CustomToastBase {...props} type="error" />,
-  warning: props => <CustomToastBase {...props} type="warning" />,
-  info: props => <CustomToastBase {...props} type="info" />,
-};
+/**
+ * Factory function to create a toast config bound to theme colors.
+ * Call this whenever the theme changes so toasts pick up the new palette.
+ */
+export const createToastConfig = (themeToastColors: ThemeToastColors): ToastConfig => ({
+  success: props => <CustomToastBase {...props} type="success" themeToastColors={themeToastColors} />,
+  error: props => <CustomToastBase {...props} type="error" themeToastColors={themeToastColors} />,
+  warning: props => <CustomToastBase {...props} type="warning" themeToastColors={themeToastColors} />,
+  info: props => <CustomToastBase {...props} type="info" themeToastColors={themeToastColors} />,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -107,7 +112,6 @@ const styles = StyleSheet.create({
     minHeight: 52,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: ToastColors.common.borderColor,
   },
   accentBar: {
     width: 4,
@@ -150,13 +154,11 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 6,
-    backgroundColor: ToastColors.common.closeButtonBackground,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeIcon: {
     fontSize: 12,
-    color: ToastColors.common.closeIconColor,
     fontWeight: '500',
   },
 });

@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import { StyleSheet, Animated, ViewStyle, Platform } from 'react-native';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface SkeletonProps {
   width?: number | string;
@@ -15,6 +16,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   borderRadius = 4,
   style,
 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -60,7 +63,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   skeleton: {
     backgroundColor: ShopColors.border,
   },

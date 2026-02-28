@@ -4,9 +4,10 @@ import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Platform } from 'react-native';
 
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function TabLayout() {
+  const { colors: ShopColors } = useTheme();
   const insets = useSafeAreaInsets();
 
   React.useEffect(() => {

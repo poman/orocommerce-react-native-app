@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { useAuth } from '@/src/context/AuthContext';
-import { ShopColors } from '@/src/constants/theme';
-import { isDemoMode } from '@/src/constants/config';
+import { useTheme } from '@/src/context/ThemeContext';
+import { isDemoMode } from '@/src/themes/config';
 import {
   User,
   ShoppingCart,
@@ -26,8 +26,11 @@ import {
 } from '@/src/libs/Icon';
 import CustomAlert from '@/src/components/CustomAlert';
 import { showToast } from '@/src/utils/toast';
+import { ThemeColors } from '@/src/themes/types';
 
 export default function ProfileScreen() {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
   const router = useRouter();
   const { isAuthenticated, user, logout, isLoading: authLoading } = useAuth();
 
@@ -244,7 +247,7 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: ShopColors.background,

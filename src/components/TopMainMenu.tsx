@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MoreVertical, Home, ShoppingBag, Heart, User, Truck } from '@/src/libs/Icon';
-import { ShopColors } from '@/src/constants/theme';
+import { useTheme } from '@/src/context/ThemeContext';
+import { ThemeColors } from '@/src/themes/types';
 
 interface TopMainMenuProps {
   iconColor?: string;
@@ -10,9 +11,12 @@ interface TopMainMenuProps {
 }
 
 export const TopMainMenu: React.FC<TopMainMenuProps> = ({
-  iconColor = ShopColors.text,
+  iconColor,
   iconSize = 24,
 }) => {
+  const { colors: ShopColors } = useTheme();
+  const styles = useMemo(() => createStyles(ShopColors), [ShopColors]);
+  const resolvedIconColor = iconColor || ShopColors.text;
   const router = useRouter();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -28,7 +32,7 @@ export const TopMainMenu: React.FC<TopMainMenuProps> = ({
   return (
     <View>
       <TouchableOpacity onPress={handleMenuPress} style={styles.menuButton} activeOpacity={0.7}>
-        <MoreVertical size={iconSize} color={iconColor} />
+        <MoreVertical size={iconSize} color={resolvedIconColor} />
       </TouchableOpacity>
 
       <Modal
@@ -90,7 +94,7 @@ export const TopMainMenu: React.FC<TopMainMenuProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (ShopColors: ThemeColors) => StyleSheet.create({
   menuButton: {
     width: 40,
     height: 40,

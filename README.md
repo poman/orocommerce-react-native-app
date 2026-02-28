@@ -22,6 +22,7 @@ A React Native mobile application for OroCommerce B2B e-commerce platform(6.1LTS
 - [Running the App](#running-the-app)
 - [Testing](#testing)
 - [Deployment](#deployment)
+- [Theming](#theming)
 - [Features](#features)
 - [License](#license)
 
@@ -163,7 +164,7 @@ After copying `app.json.example` to `app.json`, update these key sections:
 
 **Update these values:**
 - `projectId`: Your EAS Project ID
-  - If you haven't set up EAS yet, run `eas build:configure` (see [deployment.md](./deployment.md))
+  - If you haven't set up EAS yet, run `eas build:configure` (see [Deployment Guide](./docs/DEPLOYMENT.md))
   - This command will generate a unique Project ID and add it to your `app.json`
   - The Project ID links your app to your Expo account for builds
 - `EXPO_PUBLIC_API_BASE_URL`: Your OroCommerce instance URL
@@ -194,7 +195,7 @@ When you start the development server:
 
 ### Demo Mode vs Production Mode
 
-The app supports two modes configured in `src/constants/config.ts`:
+The app supports two modes configured in `src/themes/config.ts`:
 
 **Demo Mode (default):**
 - Shows test login button with demo credentials
@@ -208,7 +209,7 @@ The app supports two modes configured in `src/constants/config.ts`:
 - Configuration wizard hidden
 - Perfect for released app with fixed OroCommerce instance
 
-To switch modes, edit `src/constants/config.ts`:
+To switch modes, edit `src/themes/config.ts`:
 
 ```typescript
 export const AppConfig = {
@@ -262,7 +263,13 @@ npm run test:all            # Run all test types
 
 ## Deployment
 
-For detailed deployment instructions see **[deployment.md](./deployment.md)**
+For detailed deployment instructions see **[Deployment Guide](./docs/DEPLOYMENT.md)**
+
+## Theming
+
+The app ships with four built-in themes and a flexible theming system. You can customize colors, logos, toasts, banners, and more — or create your own theme from scratch.
+
+See the **[Theming Guide](./docs/THEMING_GUIDE.md)** for full details.
 
 ## Features
 
