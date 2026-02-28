@@ -82,35 +82,39 @@ eas build --profile production --platform android --clear-cache
 
 ## Environment Variables
 
-Configure your OroCommerce instance and OAuth credentials in one of these ways:
+The app uses a dynamic `app.config.js` that loads configuration at build time:
 
-### Option 1: EAS Secrets (Recommended for Production)
+- **Locally** → reads `app.json` (gitignored, contains your real credentials)
+- **EAS CI** → reads `app.json.example` (committed, has placeholders) + **EAS Secrets** override the placeholders via env vars
 
-Store sensitive credentials as EAS secrets:
+### Setting Up EAS Secrets (Required for CI Builds)
+
+Store your credentials and project ID as EAS secrets:
 
 ```bash
+eas secret:create --scope project --name EAS_PROJECT_ID --value "your-eas-project-id"
 eas secret:create --scope project --name EXPO_PUBLIC_API_BASE_URL --value "https://your-orocommerce.com/"
 eas secret:create --scope project --name EXPO_PUBLIC_OAUTH_CLIENT_ID --value "your_client_id"
 eas secret:create --scope project --name EXPO_PUBLIC_OAUTH_CLIENT_SECRET --value "your_client_secret"
 ```
 
-### Option 2: app.json (For Development)
+Verify secrets are set:
 
-Update the `extra` section in `app.json`:
-
-```json
-{
-  "expo": {
-    "extra": {
-      "EXPO_PUBLIC_API_BASE_URL": "https://your-orocommerce.com/",
-      "EXPO_PUBLIC_OAUTH_CLIENT_ID": "your_client_id",
-      "EXPO_PUBLIC_OAUTH_CLIENT_SECRET": "your_client_secret"
-    }
-  }
-}
+```bash
+eas secret:list
 ```
 
-**⚠️ Important:** Don't commit real credentials to your repository. Use `app.json.example` as a template.
+### Local Development
+
+Copy the example and fill in your real values:
+
+```bash
+cp app.json.example app.json
+```
+
+Edit `app.json` with your credentials. This file is gitignored — your secrets stay local.
+
+**⚠️ Important:** Never commit `app.json` with real credentials. Only `app.json.example` (with placeholders) belongs in the repo.
 
 ## Monitoring Builds
 

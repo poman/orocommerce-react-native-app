@@ -129,23 +129,15 @@ php bin/console cache:clear
 
 ## App Configuration
 
-### Update app.json
+### Local Setup
 
-After copying `app.json.example` to `app.json`, update these key sections:
+Copy the example and fill in your real values:
 
-#### 1. Basic App Information
-
-```json
-{
-  "expo": {
-    "name": "Your App Name",
-    "slug": "your-app-slug",
-    "version": "1.0.0"
-  }
-}
+```bash
+cp app.json.example app.json
 ```
 
-#### 2. OroCommerce API Configuration
+Update `app.json` with your OroCommerce URL, OAuth credentials, and EAS Project ID:
 
 ```json
 {
@@ -162,16 +154,9 @@ After copying `app.json.example` to `app.json`, update these key sections:
 }
 ```
 
-**Update these values:**
-- `projectId`: Your EAS Project ID
-  - If you haven't set up EAS yet, run `eas build:configure` (see [Deployment Guide](./docs/DEPLOYMENT.md))
-  - This command will generate a unique Project ID and add it to your `app.json`
-  - The Project ID links your app to your Expo account for builds
-- `EXPO_PUBLIC_API_BASE_URL`: Your OroCommerce instance URL
-- `EXPO_PUBLIC_OAUTH_CLIENT_ID`: From OAuth Application (Step 3)
-- `EXPO_PUBLIC_OAUTH_CLIENT_SECRET`: From OAuth Application (Step 3)
+> `app.json` is gitignored — your credentials stay local. For EAS CI builds, credentials are injected via **EAS Secrets** (see [Deployment Guide](./docs/DEPLOYMENT.md)).
 
-**Note:** You can run the app locally without the EAS Project ID, but you'll need it for cloud builds with `eas build`.
+If you haven't set up EAS yet, run `eas build:configure` to generate a Project ID.
 
 ## Running the App
 
